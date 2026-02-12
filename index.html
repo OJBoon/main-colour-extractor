@@ -93,10 +93,11 @@
     }
 
     h1 {
-      margin: 0;
-      font-size: 20px;
+      margin: 0 0 var(--space-md) 0;
+      font-size: 22px;
       font-weight: 600;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.4px;
+      flex-shrink: 0;
     }
 
     /* ============================================
@@ -104,7 +105,7 @@
        ============================================ */
     .app-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       height: 52px;
       padding: 0 var(--space-lg);
@@ -116,6 +117,7 @@
       margin: var(--space-md) var(--space-md) 0;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
       z-index: 100;
+      position: relative;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -223,10 +225,16 @@
     }
 
     /* Header Controls */
-    .header-controls {
+    .history-controls {
+      position: absolute;
+      left: var(--space-lg);
       display: flex;
-      align-items: center;
-      gap: var(--space-md);
+      gap: var(--space-xs);
+    }
+
+    .lang-toggle {
+      position: absolute;
+      right: var(--space-lg);
     }
 
     /* Device Tabs */
@@ -237,9 +245,6 @@
       padding: 4px;
       border-radius: var(--radius-md);
       border: 1px solid var(--segmented-border);
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
     }
 
     .device-tab {
@@ -269,11 +274,6 @@
     .device-tab svg {
       width: 18px;
       height: 18px;
-    }
-
-    .history-controls {
-      display: flex;
-      gap: var(--space-xs);
     }
 
     .icon-btn {
@@ -934,7 +934,18 @@
 <body>
   <!-- Header -->
   <header class="app-header">
-    <h1 data-i18n="appTitle">Color Extractor</h1>
+    <div class="history-controls">
+      <button id="undoBtn" class="icon-btn" title="Undo (Cmd+Z)" disabled>
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M3 7v6h6M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+      </button>
+      <button id="redoBtn" class="icon-btn" title="Redo (Cmd+Shift+Z)" disabled>
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M21 7v6h-6M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+      </button>
+    </div>
 
     <!-- Device Tabs -->
     <div class="device-tabs">
@@ -953,27 +964,15 @@
       </button>
     </div>
 
-    <div class="header-controls">
-      <div class="history-controls">
-        <button id="undoBtn" class="icon-btn" title="Undo (Cmd+Z)" disabled>
-          <svg viewBox="0 0 24 24" width="20" height="20">
-            <path d="M3 7v6h6M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" stroke="currentColor" stroke-width="2" fill="none"/>
-          </svg>
-        </button>
-        <button id="redoBtn" class="icon-btn" title="Redo (Cmd+Shift+Z)" disabled>
-          <svg viewBox="0 0 24 24" width="20" height="20">
-            <path d="M21 7v6h-6M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" stroke="currentColor" stroke-width="2" fill="none"/>
-          </svg>
-        </button>
-      </div>
-      <button id="langToggle" class="lang-toggle">中</button>
-    </div>
+    <button id="langToggle" class="lang-toggle">中</button>
   </header>
 
   <!-- Main Split Layout -->
   <main class="app-container">
     <!-- Left Panel: Controls -->
     <aside class="left-panel">
+      <h1 data-i18n="appTitle">Color Extractor</h1>
+
       <section class="upload-section">
         <div id="uploadZone" class="upload-zone">
           <svg class="upload-icon" viewBox="0 0 24 24">
