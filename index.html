@@ -163,7 +163,7 @@
       justify-content: center;
       align-items: center;
       height: 52px;
-      padding: 0 var(--space-lg);
+      padding: 0 var(--space-md);
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(40px) saturate(180%);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -187,7 +187,8 @@
       display: flex;
       gap: var(--space-md);
       padding: var(--space-md);
-      height: calc(100vh - 52px - var(--space-md) * 2);
+      margin-bottom: 0;
+      height: calc(100vh - 76px - var(--space-md)); /* Header + header margin (52px + 24px = 76px) + container top padding (24px) = 100px total, leaving 24px at bottom from container's padding */
     }
 
     .left-panel {
@@ -202,6 +203,7 @@
       backdrop-filter: blur(40px) saturate(180%);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
       padding: var(--space-lg);
+      padding-bottom: var(--space-lg); /* Match top padding for symmetry */
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
@@ -273,7 +275,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--space-md);
+      padding: 0 var(--space-md); /* No top/bottom padding, only left/right */
     }
 
     /* ============================================
@@ -299,16 +301,9 @@
     }
 
     /* Header Controls */
-    .history-controls {
-      position: absolute;
-      left: var(--space-lg);
-      display: flex;
-      gap: var(--space-xs);
-    }
-
     .lang-toggle {
       position: absolute;
-      right: var(--space-lg);
+      right: var(--space-md);
     }
 
     /* Device Tabs */
@@ -467,13 +462,24 @@
     }
 
     /* Section Titles */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
     .section-title {
       font-size: 11px;
       font-weight: 600;
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: var(--space-sm);
+      margin-bottom: 16px;
+    }
+
+    .section-header .section-title {
+      margin-bottom: 0;
     }
 
     /* Section Divider */
@@ -858,6 +864,28 @@
       justify-content: center;
     }
 
+    /* Footer Credit */
+    .footer-credit {
+      position: fixed;
+      bottom: 8px;
+      right: 16px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+      z-index: 1000;
+    }
+
+    .footer-credit a {
+      color: inherit;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .footer-credit a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
     /* Device Views */
     .device-view {
       width: 100%;
@@ -865,13 +893,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--space-lg);
     }
 
     .device-view.hidden {
       display: none;
     }
 
+    /* Reload Preview Button */
     /* Device Mockups */
     .device-mockup {
       position: relative;
@@ -884,9 +912,9 @@
 
     .iphone-mockup {
       position: relative;
-      width: 345px;
-      height: 702px;
       flex-shrink: 0;
+      transition: width 0.3s ease, height 0.3s ease;
+      /* Width, height, and CSS variables set by JavaScript in calculateOptimalPreviewSize() */
     }
 
     .iphone-mockup::after {
@@ -894,11 +922,13 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('iPhone Air - Cloud White - Portrait.png') center/contain no-repeat;
+      width: var(--mockup-width);
+      height: var(--mockup-height);
+      background: url('iPhone Air - Cloud White - Portrait.png') center/cover no-repeat;
+      background-size: var(--mockup-width) var(--mockup-height);
       pointer-events: none;
       z-index: 10;
+      transition: width 0.3s ease, height 0.3s ease;
     }
 
     .mac-mockup {
@@ -929,16 +959,14 @@
     }
 
     .iphone-mockup .device-screen {
-      /* Fixed pixel positioning for precise canvas placement */
+      /* Positioning controlled by JavaScript for responsive scaling */
       position: absolute;
-      top: 12px;
-      left: 40px;
-      width: 260px;
-      height: 540px;
       overflow-y: scroll;
       overflow-x: hidden;
-      border-radius: 42px;
       -webkit-overflow-scrolling: touch;
+      background: white; /* Always white background - no transparency */
+      transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease, border-radius 0.3s ease;
+      /* All dimensions (top, left, width, height, border-radius) set by JavaScript in calculateOptimalPreviewSize() */
     }
 
     /* Hide scrollbar for mobile screen */
@@ -949,6 +977,7 @@
     /* Mobile scroll content container */
     .mobile-scroll-content {
       width: 100%;
+      background: white; /* Always white background behind all content */
     }
 
     /* Mobile header image */
@@ -963,7 +992,7 @@
       width: 100%;
       height: auto;
       display: block;
-      margin-top: 16px; /* Will be scaled */
+      /* margin-top calculated and set by JavaScript based on scale */
     }
 
     .mac-mockup .device-screen {
@@ -984,6 +1013,7 @@
       width: 100%;
       aspect-ratio: 1 / 1; /* Square canvas */
       display: block;
+      border-radius: 0; /* No border radius */
     }
 
     #previewCanvasDesktop {
@@ -999,16 +1029,17 @@
       justify-content: center;
       gap: var(--space-md);
       width: 100%;
-      height: 100%;
       background: rgba(240, 240, 245, 1);
       border: none;
     }
 
     .iphone-mockup .preview-placeholder {
-      border-radius: 42px;
+      aspect-ratio: 1 / 1; /* Always 1:1 square */
+      border-radius: 0; /* No border radius */
     }
 
     .mac-mockup .preview-placeholder {
+      height: 100%;
       border-radius: 8px;
     }
 
@@ -1020,7 +1051,7 @@
       }
     }
 
-    .preview-placeholder svg {
+    .preview-placeholder > svg {
       width: 48px;
       height: 48px;
       stroke: var(--upload-icon-color);
@@ -1029,9 +1060,15 @@
       opacity: 0.5;
     }
 
-    .iphone-mockup .preview-placeholder svg {
+    .iphone-mockup .preview-placeholder > svg {
       width: 40px;
       height: 40px;
+    }
+
+    /* Upload icon inside preview upload zone should be 16px */
+    .preview-upload-zone .upload-icon {
+      width: 16px;
+      height: 16px;
     }
 
     .preview-placeholder p {
@@ -1046,6 +1083,36 @@
       margin: 0;
       color: var(--text-secondary);
       font-size: 14px;
+    }
+
+    /* Preview Upload Zone - matches sidebar style */
+    .preview-upload-zone {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 6px 10px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+    }
+
+    .preview-upload-zone:hover {
+      background: var(--bg-secondary);
+      border-color: var(--accent);
+    }
+
+    .preview-upload-zone:hover .upload-icon {
+      stroke: var(--accent);
+    }
+
+    .preview-upload-zone p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     /* ============================================
@@ -1102,19 +1169,6 @@
 <body>
   <!-- Header -->
   <header class="app-header">
-    <div class="history-controls">
-      <button id="undoBtn" class="icon-btn" title="Undo (Cmd+Z)" disabled>
-        <svg viewBox="0 0 24 24" width="20" height="20">
-          <path d="M3 7v6h6M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-      </button>
-      <button id="redoBtn" class="icon-btn" title="Redo (Cmd+Shift+Z)" disabled>
-        <svg viewBox="0 0 24 24" width="20" height="20">
-          <path d="M21 7v6h-6M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-      </button>
-    </div>
-
     <!-- Device Tabs -->
     <div class="device-tabs">
       <button class="device-tab active" data-device="iphone" title="iPhone">
@@ -1163,11 +1217,11 @@
             type="text"
             id="titleInput"
             class="text-input"
-            maxlength="40"
+            maxlength="24"
             data-i18n-placeholder="titlePlaceholder"
             placeholder="Enter title"
           >
-          <span class="char-count"><span id="titleCount">0</span>/40</span>
+          <span class="char-count"><span id="titleCount">0</span>/24</span>
         </div>
 
         <div class="control-group">
@@ -1178,18 +1232,41 @@
             type="text"
             id="subtitleInput"
             class="text-input"
-            maxlength="60"
+            maxlength="50"
             data-i18n-placeholder="subtitlePlaceholder"
             placeholder="Enter subtitle"
           >
-          <span class="char-count"><span id="subtitleCount">0</span>/60</span>
+          <span class="char-count"><span id="subtitleCount">0</span>/50</span>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Color Info Display -->
+      <section class="color-info-section">
+        <h2 class="section-title" data-i18n="colorInfo">Color Info</h2>
+        <div class="color-info">
+          <div class="color-swatch" id="colorSwatch"></div>
+          <div class="color-values">
+            <div class="color-value-row">
+              <p id="hexValue">#CCCCCC</p>
+              <button class="color-copy-btn" data-copy-target="hexValue">Copy</button>
+            </div>
+            <div class="color-value-row">
+              <p id="rgbValue">RGB(204, 204, 204)</p>
+              <button class="color-copy-btn" data-copy-target="rgbValue">Copy</button>
+            </div>
+          </div>
         </div>
       </section>
 
       <div class="section-divider"></div>
 
       <section class="controls-section">
-        <h2 class="section-title" data-i18n="colorSettings">Color Settings</h2>
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="colorSettings">Color Settings</h2>
+          <button id="resetColorSettingsBtn" class="color-copy-btn">Reset</button>
+        </div>
         <!-- Brightness Slider -->
         <div class="control-group">
           <label>
@@ -1226,26 +1303,6 @@
             <button data-value="4.5">AA 4.5</button>
             <button data-value="6.0" class="active">6.0</button>
             <button data-value="7.0">AAA 7.0</button>
-          </div>
-        </div>
-      </section>
-
-      <div class="section-divider"></div>
-
-      <!-- Color Info Display -->
-      <section class="color-info-section">
-        <h2 class="section-title" data-i18n="colorInfo">Color Info</h2>
-        <div class="color-info">
-          <div class="color-swatch" id="colorSwatch"></div>
-          <div class="color-values">
-            <div class="color-value-row">
-              <p id="hexValue">#CCCCCC</p>
-              <button class="color-copy-btn" data-copy-target="hexValue">Copy</button>
-            </div>
-            <div class="color-value-row">
-              <p id="rgbValue">RGB(204, 204, 204)</p>
-              <button class="color-copy-btn" data-copy-target="rgbValue">Copy</button>
-            </div>
           </div>
         </div>
       </section>
@@ -1294,7 +1351,14 @@
                   <circle cx="8.5" cy="8.5" r="1.5"></circle>
                   <polyline points="21 15 16 10 5 21"></polyline>
                 </svg>
-                <p data-i18n="previewPlaceholder">Upload an image to preview</p>
+                <div class="preview-upload-zone" id="previewUploadBtnMobile">
+                  <svg class="upload-icon" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <p data-i18n="uploadImage">Upload image</p>
+                </div>
               </div>
 
               <!-- Skeleton Content Image -->
@@ -1322,6 +1386,13 @@
       </div>
     </section>
   </main>
+
+  <!-- Footer Credit -->
+  <footer class="footer-credit">
+    <a href="https://github.com/OJBoon/main-colour-extractor" target="_blank" rel="noopener noreferrer">
+      Created by @ollyboon
+    </a>
+  </footer>
 
   <!-- Hidden canvas for color extraction -->
   <canvas id="extractionCanvas" style="display:none"></canvas>
@@ -1481,6 +1552,7 @@
       en: {
         appTitle: 'Color Extractor',
         uploadPrompt: 'Click or drag to upload image',
+        uploadImage: 'Upload image',
         textOverlay: 'Text Overlay',
         colorSettings: 'Color Settings',
         colorInfo: 'Color Info',
@@ -1502,6 +1574,7 @@
       zh: {
         appTitle: '提取图片主色',
         uploadPrompt: '点击或拖拽上传图片',
+        uploadImage: '上传图片',
         textOverlay: '文字叠加',
         colorSettings: '颜色设置',
         colorInfo: '颜色信息',
@@ -2280,6 +2353,12 @@
 
     uploadZone.addEventListener('click', () => fileInput.click());
 
+    // Preview upload button handler
+    const previewUploadBtnMobile = document.getElementById('previewUploadBtnMobile');
+    if (previewUploadBtnMobile) {
+      previewUploadBtnMobile.addEventListener('click', () => fileInput.click());
+    }
+
     fileInput.addEventListener('change', (e) => {
       if (e.target.files[0]) {
         handleImageUpload(e.target.files[0]);
@@ -2643,23 +2722,34 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
     }
 
     // ============================================
-    // UNDO/REDO CONTROLS
+    // RESET CONTROL
     // ============================================
-    document.getElementById('undoBtn').addEventListener('click', undo);
-    document.getElementById('redoBtn').addEventListener('click', redo);
+    // Reset Color Settings button
+    document.getElementById('resetColorSettingsBtn').addEventListener('click', () => {
+      // Reset only color settings to default
+      Object.assign(appState, {
+        brightness: 0.04,
+        gradientHeight: 33,
+        blurIntensity: 0,
+        contrastRatio: 6.0
+      });
 
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      // Cmd+Z / Ctrl+Z = Undo
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault();
-        undo();
-      }
+      // Update UI controls
+      document.getElementById('brightnessSlider').value = 0.04;
+      document.getElementById('brightnessValue').textContent = '0.04';
+      document.getElementById('gradientSlider').value = 33;
+      document.getElementById('gradientValue').textContent = '33%';
+      document.getElementById('blurSlider').value = 0;
+      document.getElementById('blurValue').textContent = '0%';
 
-      // Cmd+Shift+Z / Ctrl+Shift+Z = Redo
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
-        e.preventDefault();
-        redo();
+      // Update contrast buttons
+      document.querySelectorAll('#contrastControl button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.value === '6.0');
+      });
+
+      // Re-render preview
+      if (appState.currentImage) {
+        renderPreview();
       }
     });
 
@@ -2751,19 +2841,101 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
         }
       }
 
+      // Calculate and set optimal preview size on load
+      calculateOptimalPreviewSize();
+
       // Initialize preview
       renderPreview();
     }
 
-    // Handle window resize - redraw canvas to match new dimensions
+    // Calculate optimal size for device mockup based on viewport
+    function calculateOptimalPreviewSize() {
+      const rightPanel = document.querySelector('.right-panel');
+      const iphoneMockup = document.querySelector('.iphone-mockup');
+      const iphoneMockupAfter = iphoneMockup;
+      const deviceScreen = document.querySelector('.iphone-mockup .device-screen');
+
+      // Get available height from the actual right-panel container height
+      // This accounts for the app-container's calculated height automatically
+      const availableHeight = rightPanel.clientHeight;
+
+      // Full resolution iPhone mockup dimensions (source image)
+      const fullResWidth = 1380;
+      const fullResHeight = 2880;
+      const aspectRatio = fullResWidth / fullResHeight;
+
+      // Full resolution device screen dimensions (centered within mockup)
+      const fullResScreenWidth = 1260;
+      const fullResScreenHeight = 2736;
+      const fullResBorderRadius = 180;
+
+      // Calculate centered positioning for device screen
+      const fullResScreenLeft = (fullResWidth - fullResScreenWidth) / 2; // (1380 - 1260) / 2 = 60
+      const fullResScreenTop = (fullResHeight - fullResScreenHeight) / 2; // (2880 - 2736) / 2 = 72
+
+      // Calculate scaled dimensions to fit available space
+      let targetHeight = Math.min(availableHeight, fullResHeight);
+      let targetWidth = targetHeight * aspectRatio;
+
+      // Calculate scale factor from full resolution
+      const scale = targetHeight / fullResHeight;
+
+      // Apply scaled dimensions to mockup
+      iphoneMockup.style.width = `${targetWidth}px`;
+      iphoneMockup.style.height = `${targetHeight}px`;
+
+      // Scale the device screen proportionally from full resolution values
+      const screenWidth = fullResScreenWidth * scale;
+      const screenHeight = fullResScreenHeight * scale;
+      const screenTop = fullResScreenTop * scale;
+      const screenLeft = fullResScreenLeft * scale;
+      const screenBorderRadius = fullResBorderRadius * scale;
+
+      deviceScreen.style.width = `${screenWidth}px`;
+      deviceScreen.style.height = `${screenHeight}px`;
+      deviceScreen.style.top = `${screenTop}px`;
+      deviceScreen.style.left = `${screenLeft}px`;
+      deviceScreen.style.borderRadius = `${screenBorderRadius}px`;
+
+      // Scale skeleton margin-top from 16px at 375px design width
+      // Calculate the scale relative to 375px design width
+      const designWidth = 375;
+      const canvasWidth = screenWidth; // The actual screen width
+      const contentScale = canvasWidth / designWidth;
+      const skeletonMarginTop = 16 * contentScale;
+
+      const skeletonImg = document.querySelector('.mobile-skeleton-img');
+      if (skeletonImg) {
+        skeletonImg.style.marginTop = `${skeletonMarginTop}px`;
+      }
+
+      // Update the ::after pseudo-element via CSS custom property
+      iphoneMockup.style.setProperty('--mockup-width', `${targetWidth}px`);
+      iphoneMockup.style.setProperty('--mockup-height', `${targetHeight}px`);
+
+      // Log for debugging
+      console.log('Screen dimensions:', { screenWidth, screenHeight, scale, targetWidth, targetHeight, skeletonMarginTop });
+    }
+
+    // Auto-resize on window resize with smooth animation
     let resizeTimeout;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
+
       resizeTimeout = setTimeout(() => {
+        // Update dimensions and render simultaneously
+        // The CSS transitions on the mockup will animate smoothly
+        // while the canvas content scales with it
+        calculateOptimalPreviewSize();
+
+        // Render immediately so canvas scales during the transition
         if (appState.currentImage) {
-          renderPreview();
+          // Use requestAnimationFrame to sync with the browser's repaint
+          requestAnimationFrame(() => {
+            renderPreview();
+          });
         }
-      }, 150); // Debounce resize events
+      }, 300); // Wait 300ms after user stops resizing
     });
 
     // Wait for Poppins font to load before initializing
