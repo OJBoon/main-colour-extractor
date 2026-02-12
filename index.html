@@ -187,7 +187,7 @@
       display: flex;
       gap: var(--space-md);
       padding: var(--space-md);
-      height: calc(100vh - 52px - var(--space-md) * 2);
+      height: calc(100vh - 52px - var(--space-md) * 3); /* Header (52px) + header top margin (24px) + container top padding (24px) + container bottom padding (24px) = 124px */
     }
 
     .left-panel {
@@ -202,6 +202,7 @@
       backdrop-filter: blur(40px) saturate(180%);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
       padding: var(--space-lg);
+      padding-bottom: var(--space-lg); /* Match top padding for symmetry */
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
@@ -872,6 +873,44 @@
       display: none;
     }
 
+    /* Reload Preview Button */
+    .reload-preview-btn {
+      position: absolute;
+      right: 120px; /* Position to the left of lang toggle */
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .reload-preview-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .reload-preview-btn:not(:disabled) {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .reload-preview-btn:not(:disabled):hover {
+      background: rgba(0, 122, 255, 0.1);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+    }
+
+    .reload-preview-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
     /* Device Mockups */
     .device-mockup {
       position: relative;
@@ -884,9 +923,8 @@
 
     .iphone-mockup {
       position: relative;
-      width: 345px;
-      height: 702px;
       flex-shrink: 0;
+      /* Width, height, and CSS variables set by JavaScript in calculateOptimalPreviewSize() */
     }
 
     .iphone-mockup::after {
@@ -894,9 +932,10 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('iPhone Air - Cloud White - Portrait.png') center/contain no-repeat;
+      width: var(--mockup-width);
+      height: var(--mockup-height);
+      background: url('iPhone Air - Cloud White - Portrait.png') center/cover no-repeat;
+      background-size: var(--mockup-width) var(--mockup-height);
       pointer-events: none;
       z-index: 10;
     }
@@ -929,16 +968,13 @@
     }
 
     .iphone-mockup .device-screen {
-      /* Fixed pixel positioning for precise canvas placement */
+      /* Positioning controlled by JavaScript for responsive scaling */
       position: absolute;
-      top: 12px;
-      left: 40px;
-      width: 260px;
-      height: 540px;
       overflow-y: scroll;
       overflow-x: hidden;
-      border-radius: 42px;
       -webkit-overflow-scrolling: touch;
+      background: white; /* Always white background - no transparency */
+      /* All dimensions (top, left, width, height, border-radius) set by JavaScript in calculateOptimalPreviewSize() */
     }
 
     /* Hide scrollbar for mobile screen */
@@ -949,6 +985,7 @@
     /* Mobile scroll content container */
     .mobile-scroll-content {
       width: 100%;
+      background: white; /* Always white background behind all content */
     }
 
     /* Mobile header image */
@@ -963,7 +1000,7 @@
       width: 100%;
       height: auto;
       display: block;
-      margin-top: 16px; /* Will be scaled */
+      /* margin-top calculated and set by JavaScript based on scale */
     }
 
     .mac-mockup .device-screen {
@@ -984,6 +1021,7 @@
       width: 100%;
       aspect-ratio: 1 / 1; /* Square canvas */
       display: block;
+      border-radius: 0; /* No border radius */
     }
 
     #previewCanvasDesktop {
@@ -999,16 +1037,17 @@
       justify-content: center;
       gap: var(--space-md);
       width: 100%;
-      height: 100%;
       background: rgba(240, 240, 245, 1);
       border: none;
     }
 
     .iphone-mockup .preview-placeholder {
-      border-radius: 42px;
+      aspect-ratio: 1 / 1; /* Always 1:1 square */
+      border-radius: 0; /* No border radius */
     }
 
     .mac-mockup .preview-placeholder {
+      height: 100%;
       border-radius: 8px;
     }
 
@@ -1046,6 +1085,39 @@
       margin: 0;
       color: var(--text-secondary);
       font-size: 14px;
+    }
+
+    /* Preview Upload Button - iOS Pill Style */
+    .preview-upload-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 100px; /* Fully rounded pill */
+      font-size: 13px;
+      font-weight: 600; /* Semibold */
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: none; /* No glow */
+    }
+
+    .preview-upload-btn:hover {
+      background: #0056b3;
+      transform: scale(1.02);
+    }
+
+    .preview-upload-btn:active {
+      transform: scale(0.98);
+    }
+
+    .preview-upload-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      opacity: 1;
     }
 
     /* ============================================
@@ -1131,6 +1203,13 @@
         </svg>
       </button>
     </div>
+
+    <button id="reloadPreviewBtn" class="reload-preview-btn" disabled title="Reload Preview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 4 23 10 17 10"></polyline>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+      </svg>
+    </button>
 
     <button id="langToggle" class="lang-toggle">中</button>
   </header>
@@ -1294,7 +1373,14 @@
                   <circle cx="8.5" cy="8.5" r="1.5"></circle>
                   <polyline points="21 15 16 10 5 21"></polyline>
                 </svg>
-                <p data-i18n="previewPlaceholder">Upload an image to preview</p>
+                <button class="preview-upload-btn" id="previewUploadBtnMobile">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span data-i18n="uploadImage">Upload image</span>
+                </button>
               </div>
 
               <!-- Skeleton Content Image -->
@@ -2280,6 +2366,12 @@
 
     uploadZone.addEventListener('click', () => fileInput.click());
 
+    // Preview upload button handler
+    const previewUploadBtnMobile = document.getElementById('previewUploadBtnMobile');
+    if (previewUploadBtnMobile) {
+      previewUploadBtnMobile.addEventListener('click', () => fileInput.click());
+    }
+
     fileInput.addEventListener('change', (e) => {
       if (e.target.files[0]) {
         handleImageUpload(e.target.files[0]);
@@ -2751,19 +2843,107 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
         }
       }
 
+      // Calculate and set optimal preview size on load
+      calculateOptimalPreviewSize();
+
       // Initialize preview
       renderPreview();
     }
 
-    // Handle window resize - redraw canvas to match new dimensions
+    // Calculate optimal size for device mockup based on viewport
+    function calculateOptimalPreviewSize() {
+      const rightPanel = document.querySelector('.right-panel');
+      const iphoneMockup = document.querySelector('.iphone-mockup');
+      const iphoneMockupAfter = iphoneMockup;
+      const deviceScreen = document.querySelector('.iphone-mockup .device-screen');
+
+      // Get available height (viewport height minus header, padding, and margins)
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 60;
+      const viewportHeight = window.innerHeight;
+      const headerTopMargin = 24; // var(--space-md)
+      const rightPanelPadding = 48; // 24px top + 24px bottom
+      const extraMargin = 40; // Extra space for visual breathing room
+      const availableHeight = viewportHeight - headerHeight - headerTopMargin - rightPanelPadding - extraMargin;
+
+      // Full resolution iPhone mockup dimensions (source image)
+      const fullResWidth = 1380;
+      const fullResHeight = 2880;
+      const aspectRatio = fullResWidth / fullResHeight;
+
+      // Full resolution device screen dimensions (centered within mockup)
+      const fullResScreenWidth = 1260;
+      const fullResScreenHeight = 2736;
+      const fullResBorderRadius = 180;
+
+      // Calculate centered positioning for device screen
+      const fullResScreenLeft = (fullResWidth - fullResScreenWidth) / 2; // (1380 - 1260) / 2 = 60
+      const fullResScreenTop = (fullResHeight - fullResScreenHeight) / 2; // (2880 - 2736) / 2 = 72
+
+      // Calculate scaled dimensions to fit available space
+      let targetHeight = Math.min(availableHeight, fullResHeight);
+      let targetWidth = targetHeight * aspectRatio;
+
+      // Calculate scale factor from full resolution
+      const scale = targetHeight / fullResHeight;
+
+      // Apply scaled dimensions to mockup
+      iphoneMockup.style.width = `${targetWidth}px`;
+      iphoneMockup.style.height = `${targetHeight}px`;
+
+      // Scale the device screen proportionally from full resolution values
+      const screenWidth = fullResScreenWidth * scale;
+      const screenHeight = fullResScreenHeight * scale;
+      const screenTop = fullResScreenTop * scale;
+      const screenLeft = fullResScreenLeft * scale;
+      const screenBorderRadius = fullResBorderRadius * scale;
+
+      deviceScreen.style.width = `${screenWidth}px`;
+      deviceScreen.style.height = `${screenHeight}px`;
+      deviceScreen.style.top = `${screenTop}px`;
+      deviceScreen.style.left = `${screenLeft}px`;
+      deviceScreen.style.borderRadius = `${screenBorderRadius}px`;
+
+      // Scale skeleton margin-top from 16px at 375px design width
+      // Calculate the scale relative to 375px design width
+      const designWidth = 375;
+      const canvasWidth = screenWidth; // The actual screen width
+      const contentScale = canvasWidth / designWidth;
+      const skeletonMarginTop = 16 * contentScale;
+
+      const skeletonImg = document.querySelector('.mobile-skeleton-img');
+      if (skeletonImg) {
+        skeletonImg.style.marginTop = `${skeletonMarginTop}px`;
+      }
+
+      // Update the ::after pseudo-element via CSS custom property
+      iphoneMockup.style.setProperty('--mockup-width', `${targetWidth}px`);
+      iphoneMockup.style.setProperty('--mockup-height', `${targetHeight}px`);
+
+      // Log for debugging
+      console.log('Screen dimensions:', { screenWidth, screenHeight, scale, targetWidth, targetHeight, skeletonMarginTop });
+    }
+
+    // Enable reload button on window resize
     let resizeTimeout;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        if (appState.currentImage) {
-          renderPreview();
-        }
-      }, 150); // Debounce resize events
+        const reloadBtn = document.getElementById('reloadPreviewBtn');
+        reloadBtn.disabled = false;
+      }, 300);
+    });
+
+    // Reload preview button handler
+    document.getElementById('reloadPreviewBtn').addEventListener('click', () => {
+      const reloadBtn = document.getElementById('reloadPreviewBtn');
+      if (reloadBtn.disabled) return;
+
+      calculateOptimalPreviewSize();
+      if (appState.currentImage) {
+        renderPreview();
+      }
+      reloadBtn.disabled = true;
     });
 
     // Wait for Poppins font to load before initializing
