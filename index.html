@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <title>Color Extractor</title>
+  <title>TintSync</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
@@ -933,10 +933,9 @@
 
     .mac-mockup {
       position: relative;
-      width: 100%;
-      max-width: 1000px;
-      height: auto;
-      aspect-ratio: 1440 / 900;
+      flex-shrink: 0;
+      transition: width 0.3s ease, height 0.3s ease;
+      /* Width, height, and CSS variables set by JavaScript in calculateOptimalPreviewSize() */
     }
 
     .mac-mockup::after {
@@ -944,11 +943,13 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('MacBook Air 13" - 4th Gen - Midnight.png') center/contain no-repeat;
+      width: var(--mac-mockup-width);
+      height: var(--mac-mockup-height);
+      background: url('MacBook Air 13" - 4th Gen - Midnight.png') center/cover no-repeat;
+      background-size: var(--mac-mockup-width) var(--mac-mockup-height);
       pointer-events: none;
       z-index: 10;
+      transition: width 0.3s ease, height 0.3s ease;
     }
 
     /* Device Screen - where canvas goes */
@@ -998,14 +999,9 @@
     .mac-mockup .device-screen {
       /* Match MacBook mockup proportions and inset the screen area */
       position: absolute;
-      top: 5%;
-      left: 13.5%;
-      right: 13.5%;
-      bottom: 22%;
-      width: auto;
-      height: auto;
       overflow: hidden;
-      border-radius: 6px;
+      transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease, border-radius 0.3s ease;
+      /* All dimensions (top, left, width, height, border-radius) set by JavaScript in calculateOptimalPreviewSize() */
     }
 
     /* Canvas Styles */
@@ -1017,9 +1013,12 @@
     }
 
     #previewCanvasDesktop {
-      width: 100%;
-      height: 100%;
+      /* Match bento preview zone: 669x860 */
+      aspect-ratio: 669 / 860;
       display: block;
+      width: 100%;
+      height: auto;
+      border-radius: var(--mac-preview-radius, 12px);
     }
 
     .preview-placeholder {
@@ -1041,6 +1040,113 @@
     .mac-mockup .preview-placeholder {
       height: 100%;
       border-radius: 8px;
+    }
+
+    /* ============================================
+       PC LAYOUT (INSIDE MACBOOK SCREEN)
+       ============================================ */
+    .mac-mockup .device-screen {
+      /* Match MacBook mockup proportions and inset the screen area */
+      position: absolute;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+      transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease, border-radius 0.3s ease;
+      /* All dimensions (top, left, width, height, border-radius) set by JavaScript in calculateOptimalPreviewSize() */
+    }
+
+    .mac-mockup .device-screen::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    /* PC Header Image */
+    .pc-header-img {
+      position: relative;
+      width: 100%;
+      height: auto;
+      display: block;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    /* Scrollable content area */
+    .pc-scroll-content {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+    }
+
+    /* Blurred background - fills scroll content */
+    .pc-background-blur {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .pc-background-blur::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(140px);
+      -webkit-backdrop-filter: blur(140px);
+    }
+
+    /* Content Container with responsive padding based on 1440px design */
+    .pc-content-container {
+      position: relative;
+      width: 100%;
+      padding: var(--mac-content-padding, 48px);
+      box-sizing: border-box;
+      z-index: 1;
+    }
+
+    /* Bento wrapper - contains grid and preview */
+    .bento-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Bento Grid Image */
+    .bento-grid-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Preview Wrapper - positioned over tall card */
+    /* Bento grid full scale: 1344x860, preview zone: x0 y0 w669 h860 */
+    .pc-preview-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 49.777%; /* 669/1344 */
+      height: 100%; /* 860/860 */
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .pc-preview-wrapper canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .pc-preview-wrapper .preview-placeholder {
+      max-width: 100%;
+      max-height: 100%;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -1194,7 +1300,7 @@
     <!-- Left Panel: Controls -->
     <aside class="left-panel">
       <div class="sidebar-header">
-        <h1 data-i18n="appTitle">Color Extractor</h1>
+        <h1 data-i18n="appTitle">TintSync</h1>
         <div id="uploadZone" class="upload-zone">
           <svg class="upload-icon" viewBox="0 0 24 24">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -1372,14 +1478,34 @@
       <div class="device-view hidden" id="macView">
         <div class="device-mockup mac-mockup">
           <div class="device-screen">
-            <canvas id="previewCanvasDesktop" class="hidden"></canvas>
-            <div id="previewPlaceholderDesktop" class="preview-placeholder">
-              <svg viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-              <p data-i18n="previewPlaceholder">Upload an image to preview</p>
+            <!-- Scrollable content area -->
+            <div class="pc-scroll-content">
+              <!-- Blurred background -->
+              <div class="pc-background-blur"></div>
+
+              <!-- PC Header Image (full width, above padded content) -->
+              <img src="joybuyheaderpc.png" alt="Header" class="pc-header-img">
+
+              <!-- Content Container -->
+              <div class="pc-content-container">
+                <!-- Bento Grid with preview overlay -->
+                <div class="bento-wrapper">
+                  <img src="joybuybento.png" alt="Bento Grid" class="bento-grid-img">
+
+                  <!-- Preview positioned over tall card -->
+                  <div class="pc-preview-wrapper">
+                    <canvas id="previewCanvasDesktop" class="hidden"></canvas>
+                    <div id="previewPlaceholderDesktop" class="preview-placeholder">
+                      <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                      <p data-i18n="previewPlaceholder">Upload an image to preview</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1389,7 +1515,7 @@
 
   <!-- Footer Credit -->
   <footer class="footer-credit">
-    <a href="https://github.com/OJBoon/main-colour-extractor" target="_blank" rel="noopener noreferrer">
+    <a href="https://github.com/OJBoon/tintsync" target="_blank" rel="noopener noreferrer">
       Created by @ollyboon
     </a>
   </footer>
@@ -1550,7 +1676,7 @@
     // ============================================
     const i18n = {
       en: {
-        appTitle: 'Color Extractor',
+        appTitle: 'TintSync',
         uploadPrompt: 'Click or drag to upload image',
         uploadImage: 'Upload image',
         textOverlay: 'Text Overlay',
@@ -1572,7 +1698,7 @@
         subtitlePlaceholder: 'Enter subtitle'
       },
       zh: {
-        appTitle: '提取图片主色',
+        appTitle: 'TintSync',
         uploadPrompt: '点击或拖拽上传图片',
         uploadImage: '上传图片',
         textOverlay: '文字叠加',
@@ -2119,6 +2245,106 @@
       }
     }
 
+    // Desktop text overlay — scaled from 1440px design base
+    // Title: Poppins semibold 36px, Subtitle: Barlow medium 18px
+    // Button: 124x38 r4, Poppins medium 16px
+    // Padding: 48px bottom/left/right, 8px top (all scaled from 669px design canvas width)
+    async function renderDesktopTextOverlay(ctx, canvasWidth, canvasHeight, scale) {
+      // Scale from 668px design canvas width
+      const padding = Math.round(48 * scale);
+      const paddingTop = Math.round(8 * scale);
+      const maxTextWidth = canvasWidth - (padding * 2);
+
+      const titleFontSize = Math.round(36 * scale);
+      const subtitleFontSize = Math.round(18 * scale);
+      const buttonFontSize = Math.round(16 * scale);
+
+      const buttonWidth = Math.round(124 * scale);
+      const buttonHeight = Math.round(38 * scale);
+      const buttonRadius = Math.round(4 * scale);
+
+      // Ensure fonts are loaded
+      if (document.fonts && document.fonts.load) {
+        try {
+          await document.fonts.load(`600 ${titleFontSize}px "Poppins"`);
+          await document.fonts.load(`500 ${subtitleFontSize}px "Barlow"`);
+          await document.fonts.load(`500 ${buttonFontSize}px "Poppins"`);
+        } catch (e) {
+          // Font loading failed, continue with fallback
+        }
+      }
+
+      const textColor = getTextColor(appState.normalizedColor);
+
+      // Build layout from bottom up
+      let yPos = canvasHeight - padding; // Start from bottom padding
+
+      // Button
+      const buttonX = padding; // Left-aligned with padding
+      yPos -= buttonHeight;
+      const buttonY = yPos;
+
+      // Draw button
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(buttonX + buttonRadius, buttonY);
+      ctx.lineTo(buttonX + buttonWidth - buttonRadius, buttonY);
+      ctx.quadraticCurveTo(buttonX + buttonWidth, buttonY, buttonX + buttonWidth, buttonY + buttonRadius);
+      ctx.lineTo(buttonX + buttonWidth, buttonY + buttonHeight - buttonRadius);
+      ctx.quadraticCurveTo(buttonX + buttonWidth, buttonY + buttonHeight, buttonX + buttonWidth - buttonRadius, buttonY + buttonHeight);
+      ctx.lineTo(buttonX + buttonRadius, buttonY + buttonHeight);
+      ctx.quadraticCurveTo(buttonX, buttonY + buttonHeight, buttonX, buttonY + buttonHeight - buttonRadius);
+      ctx.lineTo(buttonX, buttonY + buttonRadius);
+      ctx.quadraticCurveTo(buttonX, buttonY, buttonX + buttonRadius, buttonY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Button text — Poppins medium 16px
+      ctx.font = `500 ${buttonFontSize}px "Poppins", sans-serif`;
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Shop now', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+
+      // Reset for text content
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = textColor;
+
+      // Space between button and subtitle
+      yPos -= paddingTop;
+
+      // Subtitle — Barlow medium 18px
+      if (appState.subtitleText) {
+        ctx.font = `500 ${subtitleFontSize}px "Barlow", "Roboto", sans-serif`;
+        const subtitleLines = wrapText(ctx, appState.subtitleText, maxTextWidth);
+        const subtitleLineHeight = Math.round(22 * scale);
+        const subtitleHeight = subtitleLines.length * subtitleLineHeight;
+
+        yPos -= subtitleHeight;
+
+        subtitleLines.forEach((line, index) => {
+          ctx.fillText(line, padding, yPos + (index * subtitleLineHeight));
+        });
+
+        // No gap between title and subtitle
+      }
+
+      // Title — Poppins semibold 36px
+      if (appState.titleText) {
+        ctx.font = `600 ${titleFontSize}px "Poppins", sans-serif`;
+        const titleLines = wrapText(ctx, appState.titleText, maxTextWidth);
+        const titleLineHeight = Math.round(44 * scale);
+        const titleHeight = titleLines.length * titleLineHeight;
+
+        yPos -= titleHeight;
+
+        titleLines.forEach((line, index) => {
+          ctx.fillText(line, padding, yPos + (index * titleLineHeight));
+        });
+      }
+    }
+
     async function renderPreview() {
       // Determine which canvas to use based on selected device
       const isMobile = appState.selectedDevice === 'iphone';
@@ -2136,112 +2362,159 @@
 
       const ctx = canvas.getContext('2d');
       const container = canvas.parentElement;
-
-      // Set canvas size based on device type
       const dpr = window.devicePixelRatio || 1;
 
-      // Get actual container dimensions (the device screen area)
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-
-      // For mobile: canvas is square (handled by CSS aspect-ratio)
-      // For desktop: canvas fills container
-      let canvasWidth, canvasHeight;
-
       if (isMobile) {
-        // Mobile canvas is square
-        canvasWidth = containerWidth;
-        canvasHeight = containerWidth;
-      } else {
-        // Desktop canvas fills container
-        canvasWidth = containerWidth;
-        canvasHeight = containerHeight;
-      }
+        // === MOBILE: Square canvas, existing behaviour ===
+        const canvasWidth = container.clientWidth;
+        const canvasHeight = canvasWidth;
 
-      canvas.width = canvasWidth * dpr;
-      canvas.height = canvasHeight * dpr;
-      ctx.scale(dpr, dpr);
+        canvas.width = canvasWidth * dpr;
+        canvas.height = canvasHeight * dpr;
+        ctx.scale(dpr, dpr);
 
-      // Draw main image covering canvas
-      if (isMobile) {
-        // Draw square image for mobile
         drawImageCover(ctx, appState.currentImage, 0, 0, canvasWidth, canvasWidth);
-      } else {
-        // Draw image covering full desktop screen
-        drawImageCover(ctx, appState.currentImage, 0, 0, canvasWidth, canvasHeight);
-      }
 
-      // LAYER 2: Apply progressive blur
-      if (appState.blurIntensity > 0 && appState.gradientHeight > 0) {
-        const workingHeight = isMobile ? canvasWidth : canvasHeight;
-        const blurHeight = workingHeight * (appState.gradientHeight / 100);
-        const blurStart = workingHeight - blurHeight;
-        const maxBlur = 40 * (appState.blurIntensity / 100);
+        // Progressive blur
+        if (appState.blurIntensity > 0 && appState.gradientHeight > 0) {
+          const workingHeight = canvasWidth;
+          const blurHeight = workingHeight * (appState.gradientHeight / 100);
+          const blurStart = workingHeight - blurHeight;
+          const maxBlur = 40 * (appState.blurIntensity / 100);
 
-        // Create offscreen canvas for blur
-        const blurCanvas = document.createElement('canvas');
-        blurCanvas.width = canvasWidth;
-        blurCanvas.height = workingHeight;
-        const blurCtx = blurCanvas.getContext('2d');
+          const blurCanvas = document.createElement('canvas');
+          blurCanvas.width = canvasWidth;
+          blurCanvas.height = workingHeight;
+          const blurCtx = blurCanvas.getContext('2d');
 
-        // Draw blurred version of image
-        blurCtx.filter = `blur(${maxBlur}px)`;
-        if (isMobile) {
+          blurCtx.filter = `blur(${maxBlur}px)`;
           drawImageCover(blurCtx, appState.currentImage, 0, 0, canvasWidth, canvasWidth);
-        } else {
-          drawImageCover(blurCtx, appState.currentImage, 0, 0, canvasWidth, canvasHeight);
-        }
-        blurCtx.filter = 'none';
+          blurCtx.filter = 'none';
 
-        // Create progressive mask (transparent at top, opaque at bottom)
-        const maskGradient = blurCtx.createLinearGradient(0, blurStart, 0, workingHeight);
-        maskGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-        maskGradient.addColorStop(1, 'rgba(255, 255, 255, 1)');
+          const maskGradient = blurCtx.createLinearGradient(0, blurStart, 0, workingHeight);
+          maskGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+          maskGradient.addColorStop(1, 'rgba(255, 255, 255, 1)');
 
-        // Apply mask to blur canvas
-        blurCtx.globalCompositeOperation = 'destination-in';
-        blurCtx.fillStyle = maskGradient;
-        blurCtx.fillRect(0, blurStart, canvasWidth, blurHeight);
+          blurCtx.globalCompositeOperation = 'destination-in';
+          blurCtx.fillStyle = maskGradient;
+          blurCtx.fillRect(0, blurStart, canvasWidth, blurHeight);
 
-        // Draw masked blur onto main canvas
-        ctx.drawImage(blurCanvas, 0, 0);
-      }
-
-      // LAYER 3: Draw gradient overlay
-      if (appState.normalizedColor) {
-        const { r, g, b } = appState.normalizedColor;
-        const workingHeight = isMobile ? canvasWidth : canvasHeight;
-
-        // Scale solid height based on canvas width (design is for 375px)
-        const designWidth = 375;
-        const scale = canvasWidth / designWidth;
-        const solidHeight = Math.round(100 * scale); // Scaled solid section
-
-        const gradientHeightPercent = appState.gradientHeight / 100;
-        const gradientPixels = workingHeight * gradientHeightPercent;
-
-        // Calculate positions
-        const solidStart = workingHeight - solidHeight;
-        const gradientStart = solidStart - gradientPixels;
-
-        // Draw gradient section (above solid section)
-        if (gradientPixels > 0) {
-          const gradient = ctx.createLinearGradient(0, gradientStart, 0, solidStart);
-          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
-          gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
-
-          ctx.fillStyle = gradient;
-          ctx.fillRect(0, gradientStart, canvasWidth, gradientPixels);
+          ctx.drawImage(blurCanvas, 0, 0);
         }
 
-        // Draw solid section (scaled bottom section)
-        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-        ctx.fillRect(0, solidStart, canvasWidth, solidHeight);
-      }
+        // Gradient overlay
+        if (appState.normalizedColor) {
+          const { r, g, b } = appState.normalizedColor;
+          const workingHeight = canvasWidth;
+          const designWidth = 375;
+          const scale = canvasWidth / designWidth;
+          const solidHeight = Math.round(100 * scale);
 
-      // LAYER 4: Draw text overlay
-      if (appState.titleText || appState.subtitleText) {
-        await renderTextOverlay(ctx, canvasWidth, canvasHeight);
+          const gradientHeightPercent = appState.gradientHeight / 100;
+          const gradientPixels = workingHeight * gradientHeightPercent;
+
+          const solidStart = workingHeight - solidHeight;
+          const gradientStart = solidStart - gradientPixels;
+
+          if (gradientPixels > 0) {
+            const gradient = ctx.createLinearGradient(0, gradientStart, 0, solidStart);
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, gradientStart, canvasWidth, gradientPixels);
+          }
+
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.fillRect(0, solidStart, canvasWidth, solidHeight);
+        }
+
+        // Text overlay (mobile)
+        if (appState.titleText || appState.subtitleText) {
+          await renderTextOverlay(ctx, canvasWidth, canvasHeight);
+        }
+
+      } else {
+        // === DESKTOP: 669x860 aspect ratio canvas ===
+        // Design reference: 669w x 860h at 1440px viewport
+        const designWidth = 1440;
+        const designCanvasW = 669;
+        const designCanvasH = 860;
+
+        const canvasWidth = container.clientWidth;
+        const canvasHeight = canvasWidth * (designCanvasH / designCanvasW);
+        const scale = canvasWidth / designCanvasW;
+
+        canvas.width = canvasWidth * dpr;
+        canvas.height = canvasHeight * dpr;
+        ctx.scale(dpr, dpr);
+
+        // Scale border-radius from 12px at full design size
+        const previewRadius = 12 * scale;
+        canvas.style.setProperty('--mac-preview-radius', `${previewRadius}px`);
+
+        // Image is 1:1 at top (square = canvasWidth x canvasWidth)
+        const imageSize = canvasWidth;
+
+        // LAYER 1: Fill entire canvas with main colour
+        if (appState.normalizedColor) {
+          const { r, g, b } = appState.normalizedColor;
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        }
+
+        // LAYER 2: Draw 1:1 image at top
+        drawImageCover(ctx, appState.currentImage, 0, 0, imageSize, imageSize);
+
+        // LAYER 3: Progressive blur (on image area)
+        if (appState.blurIntensity > 0 && appState.gradientHeight > 0) {
+          const blurHeight = imageSize * (appState.gradientHeight / 100);
+          const blurStart = imageSize - blurHeight;
+          const maxBlur = 40 * (appState.blurIntensity / 100);
+
+          const blurCanvas = document.createElement('canvas');
+          blurCanvas.width = canvasWidth;
+          blurCanvas.height = imageSize;
+          const blurCtx = blurCanvas.getContext('2d');
+
+          blurCtx.filter = `blur(${maxBlur}px)`;
+          drawImageCover(blurCtx, appState.currentImage, 0, 0, imageSize, imageSize);
+          blurCtx.filter = 'none';
+
+          const maskGradient = blurCtx.createLinearGradient(0, blurStart, 0, imageSize);
+          maskGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+          maskGradient.addColorStop(1, 'rgba(255, 255, 255, 1)');
+
+          blurCtx.globalCompositeOperation = 'destination-in';
+          blurCtx.fillStyle = maskGradient;
+          blurCtx.fillRect(0, blurStart, canvasWidth, blurHeight);
+
+          ctx.drawImage(blurCanvas, 0, 0);
+        }
+
+        // LAYER 4: Gradient anchored to bottom of image, fading into image
+        if (appState.normalizedColor) {
+          const { r, g, b } = appState.normalizedColor;
+          const gradientHeightPercent = appState.gradientHeight / 100;
+          const gradientPixels = imageSize * gradientHeightPercent;
+          const gradientStart = imageSize - gradientPixels;
+
+          if (gradientPixels > 0) {
+            const gradient = ctx.createLinearGradient(0, gradientStart, 0, imageSize);
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, gradientStart, canvasWidth, gradientPixels);
+          }
+
+          // Solid fill from image bottom to canvas bottom
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.fillRect(0, imageSize, canvasWidth, canvasHeight - imageSize);
+        }
+
+        // LAYER 5: Desktop text overlay
+        if (appState.titleText || appState.subtitleText) {
+          await renderDesktopTextOverlay(ctx, canvasWidth, canvasHeight, scale);
+        }
       }
 
       // Enable export and update CSS preview
@@ -2282,7 +2555,17 @@
 
       updateState({ dominantColor, normalizedColor });
       updateColorInfo(normalizedColor);
+      updatePCBackground();
       renderPreview();
+    }
+
+    function updatePCBackground() {
+      if (!appState.currentImage) return;
+
+      const blur = document.querySelector('.pc-background-blur');
+      if (blur) {
+        blur.style.backgroundImage = `url(${appState.currentImage.src})`;
+      }
     }
 
     // ============================================
@@ -2778,9 +3061,13 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
           macView.classList.remove('hidden');
         }
 
-        // Redraw the active canvas
+        // Recalculate preview size for the new device and redraw
+        // Use requestAnimationFrame to ensure the view is rendered before calculating
         if (appState.currentImage) {
-          updatePreview();
+          requestAnimationFrame(() => {
+            calculateOptimalPreviewSize();
+            renderPreview();
+          });
         }
       });
     });
@@ -2852,69 +3139,129 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
     function calculateOptimalPreviewSize() {
       const rightPanel = document.querySelector('.right-panel');
       const iphoneMockup = document.querySelector('.iphone-mockup');
-      const iphoneMockupAfter = iphoneMockup;
-      const deviceScreen = document.querySelector('.iphone-mockup .device-screen');
+      const macMockup = document.querySelector('.mac-mockup');
+      const iphoneDeviceScreen = document.querySelector('.iphone-mockup .device-screen');
+      const macDeviceScreen = document.querySelector('.mac-mockup .device-screen');
 
       // Get available height from the actual right-panel container height
-      // This accounts for the app-container's calculated height automatically
       const availableHeight = rightPanel.clientHeight;
+      const availableWidth = rightPanel.clientWidth;
 
-      // Full resolution iPhone mockup dimensions (source image)
-      const fullResWidth = 1380;
-      const fullResHeight = 2880;
-      const aspectRatio = fullResWidth / fullResHeight;
+      // === iPhone Mockup Scaling ===
+      if (iphoneMockup && iphoneDeviceScreen) {
+        // Full resolution iPhone mockup dimensions (source image)
+        const fullResWidth = 1380;
+        const fullResHeight = 2880;
+        const aspectRatio = fullResWidth / fullResHeight;
 
-      // Full resolution device screen dimensions (centered within mockup)
-      const fullResScreenWidth = 1260;
-      const fullResScreenHeight = 2736;
-      const fullResBorderRadius = 180;
+        // Full resolution device screen dimensions (centered within mockup)
+        const fullResScreenWidth = 1260;
+        const fullResScreenHeight = 2736;
+        const fullResBorderRadius = 180;
 
-      // Calculate centered positioning for device screen
-      const fullResScreenLeft = (fullResWidth - fullResScreenWidth) / 2; // (1380 - 1260) / 2 = 60
-      const fullResScreenTop = (fullResHeight - fullResScreenHeight) / 2; // (2880 - 2736) / 2 = 72
+        // Calculate centered positioning for device screen
+        const fullResScreenLeft = (fullResWidth - fullResScreenWidth) / 2;
+        const fullResScreenTop = (fullResHeight - fullResScreenHeight) / 2;
 
-      // Calculate scaled dimensions to fit available space
-      let targetHeight = Math.min(availableHeight, fullResHeight);
-      let targetWidth = targetHeight * aspectRatio;
+        // Calculate scaled dimensions to fit available space
+        let targetHeight = Math.min(availableHeight, fullResHeight);
+        let targetWidth = targetHeight * aspectRatio;
 
-      // Calculate scale factor from full resolution
-      const scale = targetHeight / fullResHeight;
+        // Calculate scale factor from full resolution
+        const scale = targetHeight / fullResHeight;
 
-      // Apply scaled dimensions to mockup
-      iphoneMockup.style.width = `${targetWidth}px`;
-      iphoneMockup.style.height = `${targetHeight}px`;
+        // Apply scaled dimensions to mockup
+        iphoneMockup.style.width = `${targetWidth}px`;
+        iphoneMockup.style.height = `${targetHeight}px`;
 
-      // Scale the device screen proportionally from full resolution values
-      const screenWidth = fullResScreenWidth * scale;
-      const screenHeight = fullResScreenHeight * scale;
-      const screenTop = fullResScreenTop * scale;
-      const screenLeft = fullResScreenLeft * scale;
-      const screenBorderRadius = fullResBorderRadius * scale;
+        // Scale the device screen proportionally
+        const screenWidth = fullResScreenWidth * scale;
+        const screenHeight = fullResScreenHeight * scale;
+        const screenTop = fullResScreenTop * scale;
+        const screenLeft = fullResScreenLeft * scale;
+        const screenBorderRadius = fullResBorderRadius * scale;
 
-      deviceScreen.style.width = `${screenWidth}px`;
-      deviceScreen.style.height = `${screenHeight}px`;
-      deviceScreen.style.top = `${screenTop}px`;
-      deviceScreen.style.left = `${screenLeft}px`;
-      deviceScreen.style.borderRadius = `${screenBorderRadius}px`;
+        iphoneDeviceScreen.style.width = `${screenWidth}px`;
+        iphoneDeviceScreen.style.height = `${screenHeight}px`;
+        iphoneDeviceScreen.style.top = `${screenTop}px`;
+        iphoneDeviceScreen.style.left = `${screenLeft}px`;
+        iphoneDeviceScreen.style.borderRadius = `${screenBorderRadius}px`;
 
-      // Scale skeleton margin-top from 16px at 375px design width
-      // Calculate the scale relative to 375px design width
-      const designWidth = 375;
-      const canvasWidth = screenWidth; // The actual screen width
-      const contentScale = canvasWidth / designWidth;
-      const skeletonMarginTop = 16 * contentScale;
+        // Scale skeleton margin-top
+        const designWidth = 375;
+        const contentScale = screenWidth / designWidth;
+        const skeletonMarginTop = 16 * contentScale;
 
-      const skeletonImg = document.querySelector('.mobile-skeleton-img');
-      if (skeletonImg) {
-        skeletonImg.style.marginTop = `${skeletonMarginTop}px`;
+        const skeletonImg = document.querySelector('.mobile-skeleton-img');
+        if (skeletonImg) {
+          skeletonImg.style.marginTop = `${skeletonMarginTop}px`;
+        }
+
+        // Update CSS custom properties for pseudo-element
+        iphoneMockup.style.setProperty('--mockup-width', `${targetWidth}px`);
+        iphoneMockup.style.setProperty('--mockup-height', `${targetHeight}px`);
+
+        console.log('iPhone dimensions:', { screenWidth, screenHeight, scale, targetWidth, targetHeight });
       }
 
-      // Update the ::after pseudo-element via CSS custom property
-      iphoneMockup.style.setProperty('--mockup-width', `${targetWidth}px`);
-      iphoneMockup.style.setProperty('--mockup-height', `${targetHeight}px`);
+      // === MacBook Mockup Scaling ===
+      if (macMockup && macDeviceScreen) {
+        // Full resolution MacBook mockup dimensions (source image)
+        const fullResWidth = 3220;
+        const fullResHeight = 2100;
+        const aspectRatio = fullResWidth / fullResHeight;
 
-      // Log for debugging
-      console.log('Screen dimensions:', { screenWidth, screenHeight, scale, targetWidth, targetHeight, skeletonMarginTop });
+        // Full resolution device screen dimensions (exact measurements)
+        const fullResScreenWidth = 2560;
+        const fullResScreenHeight = 1664;
+        const fullResBorderRadiusTop = 34;
+        const fullResBorderRadiusBottom = 0;
+
+        // Exact positioning for device screen at full resolution
+        const fullResScreenLeft = 330;
+        const fullResScreenTop = 218;
+
+        // Calculate scaled dimensions to fit available space (prefer width-based for landscape)
+        let targetWidth = Math.min(availableWidth, fullResWidth);
+        let targetHeight = targetWidth / aspectRatio;
+
+        // If height exceeds available space, scale by height instead
+        if (targetHeight > availableHeight) {
+          targetHeight = availableHeight;
+          targetWidth = targetHeight * aspectRatio;
+        }
+
+        // Calculate scale factor from full resolution
+        const scale = targetWidth / fullResWidth;
+
+        // Apply scaled dimensions to mockup
+        macMockup.style.width = `${targetWidth}px`;
+        macMockup.style.height = `${targetHeight}px`;
+
+        // Scale the device screen proportionally from full resolution values
+        const screenWidth = fullResScreenWidth * scale;
+        const screenHeight = fullResScreenHeight * scale;
+        const screenTop = fullResScreenTop * scale;
+        const screenLeft = fullResScreenLeft * scale;
+        const screenBorderRadiusTop = fullResBorderRadiusTop * scale;
+        const screenBorderRadiusBottom = fullResBorderRadiusBottom * scale;
+
+        macDeviceScreen.style.width = `${screenWidth}px`;
+        macDeviceScreen.style.height = `${screenHeight}px`;
+        macDeviceScreen.style.top = `${screenTop}px`;
+        macDeviceScreen.style.left = `${screenLeft}px`;
+        macDeviceScreen.style.borderRadius = `${screenBorderRadiusTop}px ${screenBorderRadiusTop}px ${screenBorderRadiusBottom}px ${screenBorderRadiusBottom}px`;
+
+        // Scale content padding from 1440px design baseline (48px at 1440px)
+        const contentPadding = 48 * (screenWidth / 1440);
+        macDeviceScreen.style.setProperty('--mac-content-padding', `${contentPadding}px`);
+
+        // Update CSS custom properties for pseudo-element
+        macMockup.style.setProperty('--mac-mockup-width', `${targetWidth}px`);
+        macMockup.style.setProperty('--mac-mockup-height', `${targetHeight}px`);
+
+        console.log('MacBook dimensions:', { screenWidth, screenHeight, scale, targetWidth, targetHeight });
+      }
     }
 
     // Auto-resize on window resize with smooth animation
