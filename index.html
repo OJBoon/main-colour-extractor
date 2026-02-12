@@ -101,13 +101,25 @@
       align-items: center;
       height: 64px;
       padding: 0 var(--space-lg);
-      background: rgba(255, 255, 255, 0.8);
+      background: var(--bg-primary);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border-light);
       position: sticky;
       top: 0;
       z-index: 100;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .app-header {
+        background: rgba(28, 28, 30, 0.8);
+      }
+    }
+
+    @media (prefers-color-scheme: light) {
+      .app-header {
+        background: rgba(255, 255, 255, 0.8);
+      }
     }
 
     .app-container {
