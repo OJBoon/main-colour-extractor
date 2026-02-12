@@ -1334,9 +1334,19 @@
     }
 
     // Helper: Render text with shadow for readability
-    function renderTextOverlay(ctx, size) {
+    async function renderTextOverlay(ctx, size) {
       const padding = 24;
       const maxTextWidth = size - (padding * 2);
+
+      // Ensure Poppins font is loaded before rendering
+      if (document.fonts && document.fonts.load) {
+        try {
+          await document.fonts.load('600 34px Poppins');
+          await document.fonts.load('500 18px Poppins');
+        } catch (e) {
+          // Font loading failed, continue with fallback
+        }
+      }
 
       // Title
       if (appState.titleText) {
@@ -1395,7 +1405,7 @@
       ctx.shadowOffsetY = 0;
     }
 
-    function renderPreview() {
+    async function renderPreview() {
       const canvas = document.getElementById('previewCanvas');
       const placeholder = document.getElementById('previewPlaceholder');
 
@@ -1483,7 +1493,7 @@
 
       // LAYER 4: Draw text overlay
       if (appState.titleText || appState.subtitleText) {
-        renderTextOverlay(ctx, size);
+        await renderTextOverlay(ctx, size);
       }
 
       // Enable export
@@ -1751,7 +1761,7 @@
     // ============================================
     document.getElementById('exportBtn').addEventListener('click', exportImage);
 
-    function exportImage() {
+    async function exportImage() {
       if (!appState.currentImage || !appState.normalizedColor) return;
 
       const exportCanvas = document.createElement('canvas');
@@ -1818,7 +1828,7 @@
 
       // LAYER 4: Draw text overlay
       if (appState.titleText || appState.subtitleText) {
-        renderTextOverlay(ctx, EXPORT_SIZE);
+        await renderTextOverlay(ctx, EXPORT_SIZE);
       }
 
       // Download
