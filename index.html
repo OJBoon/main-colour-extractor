@@ -705,9 +705,9 @@
         <div class="control-group">
           <label>
             <span data-i18n="blurIntensity">Blur Intensity</span>
-            <span id="blurValue" class="control-value">50%</span>
+            <span id="blurValue" class="control-value">0%</span>
           </label>
-          <input type="range" id="blurSlider" min="0" max="100" step="1" value="50">
+          <input type="range" id="blurSlider" min="0" max="100" step="1" value="0">
         </div>
 
         <!-- Contrast Segmented Control -->
@@ -780,7 +780,7 @@
       normalizedColor: null,
       brightness: 0.04,
       gradientHeight: 33,
-      blurIntensity: 50,
+      blurIntensity: 0,
       contrastRatio: 6.0,
       currentLanguage: localStorage.getItem('language') || 'en',
       canExport: false,
@@ -1886,7 +1886,15 @@
       renderPreview();
     }
 
-    init();
+    // Wait for Poppins font to load before initializing
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        init();
+      });
+    } else {
+      // Fallback for browsers without Font Loading API
+      init();
+    }
   </script>
 </body>
 </html>
