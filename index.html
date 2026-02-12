@@ -151,7 +151,7 @@
 
     /* Apple-style scrollbar for left panel */
     .left-panel::-webkit-scrollbar {
-      width: 6px;
+      width: 10px;
     }
 
     .left-panel::-webkit-scrollbar-track {
@@ -162,10 +162,14 @@
     .left-panel::-webkit-scrollbar-thumb {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 3px;
+      border-right: 2px solid transparent;
+      border-left: 2px solid transparent;
+      background-clip: padding-box;
     }
 
     .left-panel::-webkit-scrollbar-thumb:hover {
       background: rgba(0, 0, 0, 0.3);
+      background-clip: padding-box;
     }
 
     @media (prefers-color-scheme: dark) {
