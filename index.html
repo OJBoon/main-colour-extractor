@@ -92,12 +92,9 @@
       }
     }
 
-    h1 {
+    .sidebar-header {
       margin: 0;
       padding: var(--space-lg) var(--space-lg) var(--space-lg);
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing: -0.4px;
       flex-shrink: 0;
       position: sticky;
       top: calc(var(--space-lg) * -1);
@@ -111,10 +108,21 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       margin: calc(var(--space-lg) * -1) calc(var(--space-lg) * -1) 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
     }
 
     @media (prefers-color-scheme: dark) {
-      h1 {
+      .sidebar-header {
         background: linear-gradient(
           to bottom,
           rgba(28, 28, 30, 0.9) 0%,
@@ -322,137 +330,131 @@
       cursor: not-allowed;
     }
 
-    /* Upload Zone */
-    .upload-section {
-      margin-bottom: var(--space-md);
-    }
-
+    /* Upload Zone - Compact Version */
     .upload-zone {
-      border: 1.5px solid rgba(0, 0, 0, 0.1);
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: var(--space-lg);
-      text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
-      flex-direction: row;
       align-items: center;
-      justify-content: center;
-      gap: var(--space-sm);
+      gap: var(--space-xs);
+      flex-shrink: 0;
     }
 
-    .upload-zone:hover {
+    .upload-zone:not(.has-image) {
+      padding: 6px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+    }
+
+    .upload-zone:not(.has-image):hover {
+      background: var(--bg-secondary);
       border-color: var(--accent);
-      background: rgba(255, 255, 255, 0.5);
-      transform: translateY(-1px);
     }
 
     .upload-zone.drag-over {
       border-color: var(--accent);
-      background: rgba(255, 255, 255, 0.6);
-      transform: scale(1.01);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .upload-zone {
-        border: 1.5px solid rgba(255, 255, 255, 0.15);
-        background: rgba(28, 28, 30, 0.3);
-      }
-
-      .upload-zone:hover {
-        background: rgba(28, 28, 30, 0.5);
-      }
-
-      .upload-zone.drag-over {
-        background: rgba(28, 28, 30, 0.6);
-      }
-    }
-
-    .upload-zone.has-image {
-      padding: var(--space-md);
-      flex-direction: column;
-      gap: var(--space-sm);
+      background: var(--bg-secondary);
     }
 
     .upload-icon {
-      width: 20px;
-      height: 20px;
-      stroke: var(--upload-icon-color);
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-secondary);
       stroke-width: 2;
       fill: none;
       flex-shrink: 0;
     }
 
-    .upload-zone.drag-over .upload-icon {
+    .upload-zone:hover .upload-icon {
       stroke: var(--accent);
     }
 
     .upload-zone p {
       margin: 0;
       color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     .upload-thumbnail {
-      width: 60px;
-      height: 60px;
+      width: 32px;
+      height: 32px;
       object-fit: cover;
-      border-radius: var(--radius-sm);
+      border-radius: 6px;
       flex-shrink: 0;
     }
 
-    .upload-filename {
-      font-size: 12px;
-      color: var(--text-primary);
-      font-weight: 600;
-      word-break: break-all;
-      flex: 1;
-      text-align: left;
+    .upload-menu {
+      position: relative;
     }
 
-    .change-image-btn {
-      font-size: 11px;
-      color: var(--accent);
-      text-decoration: none;
-      cursor: pointer;
-      font-weight: 600;
-      background: rgba(0, 122, 255, 0.1);
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
-      transition: all 0.2s ease;
+    .upload-menu-btn {
+      background: none;
       border: none;
-      white-space: nowrap;
-    }
-
-    .change-image-btn:hover {
-      background: rgba(0, 122, 255, 0.15);
-    }
-
-    .upload-actions {
+      cursor: pointer;
+      padding: 4px;
       display: flex;
-      gap: var(--space-xs);
       align-items: center;
-    }
-
-    .delete-btn {
-      font-size: 11px;
-      color: #ff3b30;
-      background: rgba(255, 59, 48, 0.1);
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
+      justify-content: center;
+      color: var(--text-secondary);
+      border-radius: 4px;
       transition: all 0.2s ease;
-      white-space: nowrap;
     }
 
-    .delete-btn:hover {
-      background: rgba(255, 59, 48, 0.15);
+    .upload-menu-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .upload-menu-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .upload-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      padding: 4px;
+      min-width: 140px;
+      z-index: 100;
+      display: none;
+    }
+
+    .upload-dropdown.show {
+      display: block;
+    }
+
+    .upload-dropdown button {
+      width: 100%;
+      text-align: left;
+      padding: 6px 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      color: var(--text-primary);
+    }
+
+    .upload-dropdown button:hover {
+      background: var(--bg-secondary);
+    }
+
+    .upload-dropdown button.delete {
+      color: #ff3b30;
+    }
+
+    .upload-dropdown button.delete:hover {
+      background: rgba(255, 59, 48, 0.1);
     }
 
     /* Text Input Styles */
@@ -995,19 +997,18 @@
   <main class="app-container">
     <!-- Left Panel: Controls -->
     <aside class="left-panel">
-      <h1 data-i18n="appTitle">Color Extractor</h1>
-
-      <section class="upload-section">
+      <div class="sidebar-header">
+        <h1 data-i18n="appTitle">Color Extractor</h1>
         <div id="uploadZone" class="upload-zone">
           <svg class="upload-icon" viewBox="0 0 24 24">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <p data-i18n="uploadPrompt">Click or drag to upload image</p>
+          <p data-i18n="uploadPrompt">Upload</p>
         </div>
         <input type="file" id="fileInput" accept="image/*" hidden>
-      </section>
+      </div>
 
       <!-- Text Overlay Section -->
       <section class="text-section">
@@ -1925,22 +1926,45 @@
         uploadZone.classList.add('has-image');
         uploadZone.innerHTML = `
           <img src="${appState.currentImage.src}" alt="Uploaded" class="upload-thumbnail">
-          <div class="upload-filename">${appState.imageFileName}</div>
-          <div class="upload-actions">
-            <a class="change-image-btn" data-i18n="changeImage">${t('changeImage')}</a>
-            <button class="delete-btn" id="deleteImageBtn" data-i18n="deleteImage">${t('deleteImage')}</button>
+          <div class="upload-menu">
+            <button class="upload-menu-btn" id="uploadMenuBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="1"></circle>
+                <circle cx="12" cy="5" r="1"></circle>
+                <circle cx="12" cy="19" r="1"></circle>
+              </svg>
+            </button>
+            <div class="upload-dropdown" id="uploadDropdown">
+              <button id="changeImageBtn" data-i18n="changeImage">${t('changeImage')}</button>
+              <button class="delete" id="deleteImageBtn" data-i18n="deleteImage">${t('deleteImage')}</button>
+            </div>
           </div>
         `;
 
         // Event listeners
-        uploadZone.querySelector('.change-image-btn').addEventListener('click', (e) => {
+        const menuBtn = document.getElementById('uploadMenuBtn');
+        const dropdown = document.getElementById('uploadDropdown');
+
+        menuBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          dropdown.classList.toggle('show');
+        });
+
+        document.getElementById('changeImageBtn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          dropdown.classList.remove('show');
           fileInput.click();
         });
 
         document.getElementById('deleteImageBtn').addEventListener('click', (e) => {
           e.stopPropagation();
+          dropdown.classList.remove('show');
           handleImageDelete();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          dropdown.classList.remove('show');
         });
       } else {
         uploadZone.classList.remove('has-image');
@@ -1950,7 +1974,7 @@
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <p data-i18n="uploadPrompt">${t('uploadPrompt')}</p>
+          <p data-i18n="uploadPrompt">Upload</p>
         `;
       }
     }
