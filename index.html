@@ -94,9 +94,9 @@
 
     h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 600;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.3px;
     }
 
     /* ============================================
@@ -106,7 +106,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 64px;
+      height: 52px;
       padding: 0 var(--space-lg);
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(40px) saturate(180%);
@@ -130,7 +130,7 @@
       display: flex;
       gap: var(--space-md);
       padding: var(--space-md);
-      min-height: calc(100vh - 64px - var(--space-md));
+      height: calc(100vh - 52px - var(--space-md) * 2);
     }
 
     .left-panel {
@@ -146,6 +146,7 @@
       border-radius: var(--radius-lg);
       overflow-y: auto;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      height: 100%;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -191,6 +192,48 @@
       display: flex;
       align-items: center;
       gap: var(--space-md);
+    }
+
+    /* Device Tabs */
+    .device-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--segmented-bg);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--segmented-border);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .device-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      color: var(--text-secondary);
+    }
+
+    .device-tab:hover:not(.active) {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .device-tab.active {
+      background: var(--bg-primary);
+      border-color: var(--border-light);
+      box-shadow: var(--shadow-sm);
+      color: var(--text-primary);
+    }
+
+    .device-tab svg {
+      width: 18px;
+      height: 18px;
     }
 
     .history-controls {
@@ -598,7 +641,7 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       width: 100%;
       font-family: inherit;
-      margin-top: auto;
+      flex-shrink: 0;
     }
 
     .btn-primary:hover:not(:disabled) {
@@ -862,6 +905,24 @@
   <!-- Header -->
   <header class="app-header">
     <h1 data-i18n="appTitle">Color Extractor</h1>
+
+    <!-- Device Tabs -->
+    <div class="device-tabs">
+      <button class="device-tab active" data-device="iphone" title="iPhone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+      </button>
+      <button class="device-tab" data-device="mac" title="Mac">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      </button>
+    </div>
+
     <div class="header-controls">
       <div class="history-controls">
         <button id="undoBtn" class="icon-btn" title="Undo (Cmd+Z)" disabled>
@@ -1047,7 +1108,8 @@
       currentLanguage: localStorage.getItem('language') || 'en',
       canExport: false,
       titleText: '',
-      subtitleText: ''
+      subtitleText: '',
+      selectedDevice: 'iphone'
     };
 
     // History stack for undo/redo
@@ -2197,6 +2259,21 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
         e.preventDefault();
         redo();
       }
+    });
+
+    // ============================================
+    // DEVICE TABS
+    // ============================================
+    document.querySelectorAll('.device-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active state
+        document.querySelectorAll('.device-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Store selected device (will use later)
+        const device = tab.dataset.device;
+        appState.selectedDevice = device;
+      });
     });
 
     // ============================================
