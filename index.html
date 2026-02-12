@@ -495,9 +495,9 @@
         <div class="control-group">
           <label>
             <span data-i18n="brightness">Brightness</span>
-            <span id="brightnessValue" class="control-value">0.06</span>
+            <span id="brightnessValue" class="control-value">0.04</span>
           </label>
-          <input type="range" id="brightnessSlider" min="0.01" max="0.20" step="0.01" value="0.06">
+          <input type="range" id="brightnessSlider" min="0.01" max="0.20" step="0.01" value="0.04">
         </div>
 
         <!-- Gradient Height Slider -->
@@ -572,7 +572,7 @@
       imageFileName: '',
       dominantColor: null,
       normalizedColor: null,
-      brightness: 0.06,
+      brightness: 0.04,
       gradientHeight: 33,
       contrastRatio: 6.0,
       currentLanguage: localStorage.getItem('language') || 'en',
@@ -975,15 +975,27 @@
       // Draw gradient overlay
       if (appState.normalizedColor) {
         const { r, g, b } = appState.normalizedColor;
-        const gradientHeight = appState.gradientHeight / 100;
-        const gradientStart = size * (1 - gradientHeight);
+        const solidHeight = 100; // Fixed 100px solid section
+        const gradientHeightPercent = appState.gradientHeight / 100;
+        const gradientPixels = size * gradientHeightPercent;
 
-        const gradient = ctx.createLinearGradient(0, gradientStart, 0, size);
-        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
-        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+        // Calculate positions
+        const solidStart = size - solidHeight;
+        const gradientStart = solidStart - gradientPixels;
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, gradientStart, size, size - gradientStart);
+        // Draw gradient section (above solid section)
+        if (gradientPixels > 0) {
+          const gradient = ctx.createLinearGradient(0, gradientStart, 0, solidStart);
+          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+          gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, gradientStart, size, gradientPixels);
+        }
+
+        // Draw solid section (bottom 100px)
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.fillRect(0, solidStart, size, solidHeight);
       }
 
       // Enable export
@@ -1147,17 +1159,29 @@
       // Draw image at high resolution
       drawImageCover(ctx, appState.currentImage, 0, 0, EXPORT_SIZE, EXPORT_SIZE);
 
-      // Draw gradient
+      // Draw gradient overlay
       const { r, g, b } = appState.normalizedColor;
-      const gradientHeight = appState.gradientHeight / 100;
-      const gradientStart = EXPORT_SIZE * (1 - gradientHeight);
+      const solidHeight = 100; // Fixed 100px solid section
+      const gradientHeightPercent = appState.gradientHeight / 100;
+      const gradientPixels = EXPORT_SIZE * gradientHeightPercent;
 
-      const gradient = ctx.createLinearGradient(0, gradientStart, 0, EXPORT_SIZE);
-      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
-      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+      // Calculate positions
+      const solidStart = EXPORT_SIZE - solidHeight;
+      const gradientStart = solidStart - gradientPixels;
 
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, gradientStart, EXPORT_SIZE, EXPORT_SIZE - gradientStart);
+      // Draw gradient section (above solid section)
+      if (gradientPixels > 0) {
+        const gradient = ctx.createLinearGradient(0, gradientStart, 0, solidStart);
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, gradientStart, EXPORT_SIZE, gradientPixels);
+      }
+
+      // Draw solid section (bottom 100px)
+      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+      ctx.fillRect(0, solidStart, EXPORT_SIZE, solidHeight);
 
       // Download
       exportCanvas.toBlob((blob) => {
