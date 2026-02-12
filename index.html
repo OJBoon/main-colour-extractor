@@ -1341,21 +1341,16 @@
       // Ensure Poppins font is loaded before rendering
       if (document.fonts && document.fonts.load) {
         try {
-          await document.fonts.load('600 34px Poppins');
-          await document.fonts.load('500 18px Poppins');
+          await document.fonts.load('600 34px "Poppins"');
+          await document.fonts.load('500 18px "Poppins"');
         } catch (e) {
           // Font loading failed, continue with fallback
         }
       }
 
-      // Force the canvas to apply the font by setting it first
-      // This primes the canvas rendering pipeline
-      ctx.font = '600 34px Poppins, sans-serif';
-      ctx.font = '500 18px Poppins, sans-serif';
-
       // Title
       if (appState.titleText) {
-        ctx.font = '600 34px Poppins, sans-serif';
+        ctx.font = '600 34px "Poppins", sans-serif';
 
         // Auto text color based on background luminance
         const textColor = getTextColor(appState.normalizedColor);
@@ -1393,7 +1388,7 @@
 
         // Subtitle
         if (appState.subtitleText) {
-          ctx.font = '500 18px Poppins, sans-serif';
+          ctx.font = '500 18px "Poppins", sans-serif';
 
           const subtitleLines = wrapText(ctx, appState.subtitleText, maxTextWidth);
 
@@ -1901,15 +1896,15 @@
       // This ensures the font is fully loaded in the rendering pipeline
       if (document.fonts && document.fonts.load) {
         try {
-          await document.fonts.load('600 34px Poppins');
-          await document.fonts.load('500 18px Poppins');
+          await document.fonts.load('600 34px "Poppins"');
+          await document.fonts.load('500 18px "Poppins"');
 
           // Create a temporary canvas to force the browser to fully initialize the font
           const tempCanvas = document.createElement('canvas');
           const tempCtx = tempCanvas.getContext('2d');
-          tempCtx.font = '600 34px Poppins, sans-serif';
+          tempCtx.font = '600 34px "Poppins", sans-serif';
           tempCtx.fillText('Test', 0, 0);
-          tempCtx.font = '500 18px Poppins, sans-serif';
+          tempCtx.font = '500 18px "Poppins", sans-serif';
           tempCtx.fillText('Test', 0, 0);
         } catch (e) {
           // Font loading failed, continue anyway
