@@ -80,9 +80,16 @@
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
       color: var(--text-primary);
-      background: var(--bg-secondary);
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       font-size: 15px;
       line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #1a1a1d 0%, #2d2d30 100%);
+      }
     }
 
     h1 {
@@ -100,50 +107,61 @@
       justify-content: space-between;
       align-items: center;
       height: 64px;
-      padding: 0 var(--space-lg);
-      background: var(--bg-primary);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-light);
-      position: sticky;
-      top: 0;
+      padding: 0 var(--space-xl);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius-lg);
+      margin: var(--space-lg) var(--space-lg) 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
       z-index: 100;
     }
 
     @media (prefers-color-scheme: dark) {
       .app-header {
-        background: rgba(28, 28, 30, 0.8);
-      }
-    }
-
-    @media (prefers-color-scheme: light) {
-      .app-header {
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(28, 28, 30, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     }
 
     .app-container {
-      display: grid;
-      grid-template-columns: 400px 1fr;
-      height: calc(100vh - 64px);
+      display: flex;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      min-height: calc(100vh - 64px - var(--space-lg));
     }
 
     .left-panel {
-      background: var(--bg-primary);
+      width: 420px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
       padding: var(--space-xl);
       display: flex;
       flex-direction: column;
       gap: var(--space-lg);
-      border-right: 1px solid var(--border-light);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius-lg);
       overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .left-panel {
+        background: rgba(28, 28, 30, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
     }
 
     .right-panel {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: var(--space-xl);
-      min-height: 100%;
     }
 
     /* ============================================
@@ -208,9 +226,11 @@
     }
 
     .upload-zone {
-      border: 2px dashed #d2d2d7;
+      border: 2px dashed rgba(0, 0, 0, 0.1);
       border-radius: var(--radius-lg);
-      background: var(--bg-tertiary);
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       padding: var(--space-xxl) var(--space-xl);
       text-align: center;
       cursor: pointer;
@@ -225,22 +245,29 @@
 
     .upload-zone:hover {
       border-color: var(--accent);
-      background: var(--bg-tertiary);
+      background: rgba(255, 255, 255, 0.6);
+      transform: translateY(-2px);
     }
 
     .upload-zone.drag-over {
       border-color: var(--accent);
-      background: var(--bg-tertiary);
+      background: rgba(255, 255, 255, 0.8);
       border-style: solid;
+      transform: scale(1.02);
     }
 
     @media (prefers-color-scheme: dark) {
+      .upload-zone {
+        border: 2px dashed rgba(255, 255, 255, 0.15);
+        background: rgba(28, 28, 30, 0.4);
+      }
+
       .upload-zone:hover {
-        background: #2a2a2c;
+        background: rgba(28, 28, 30, 0.6);
       }
 
       .upload-zone.drag-over {
-        background: #2a2a2c;
+        background: rgba(28, 28, 30, 0.8);
       }
     }
 
@@ -333,9 +360,19 @@
 
     /* Text Input Styles */
     .text-section {
-      padding: var(--space-md) 0;
-      border-top: 1px solid var(--border-light);
-      border-bottom: 1px solid var(--border-light);
+      padding: var(--space-lg);
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .text-section {
+        background: rgba(28, 28, 30, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
     }
 
     .text-input {
@@ -476,9 +513,19 @@
       display: flex;
       gap: var(--space-md);
       padding: var(--space-md);
-      background: var(--bg-tertiary);
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       align-items: center;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .color-info {
+        background: rgba(28, 28, 30, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
     }
 
     .color-swatch {
@@ -595,13 +642,22 @@
 
     /* CSS Code Preview */
     .css-preview {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: var(--radius-md);
       padding: var(--space-md);
       position: relative;
       margin-bottom: var(--space-md);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .css-preview {
+        background: rgba(28, 28, 30, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
     }
 
     .css-preview-header {
@@ -702,8 +758,14 @@
       width: 100%;
       height: 100%;
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
       background: var(--bg-tertiary);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #previewCanvas {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
     }
 
     .preview-placeholder {
@@ -715,8 +777,19 @@
       width: 100%;
       height: 100%;
       border-radius: var(--radius-lg);
-      background: var(--bg-tertiary);
-      border: 2px dashed #d2d2d7;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 2px dashed rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .preview-placeholder {
+        background: rgba(28, 28, 30, 0.5);
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
     }
 
     .preview-placeholder svg {
@@ -737,17 +810,25 @@
     /* ============================================
        RESPONSIVE STYLES
        ============================================ */
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
       .app-container {
-        grid-template-columns: 1fr;
-        height: auto;
+        flex-direction: column;
       }
 
       .left-panel {
-        border-right: none;
-        border-bottom: 1px solid var(--border-light);
+        width: 100%;
       }
 
+      .app-header {
+        margin: var(--space-md);
+      }
+
+      .app-container {
+        padding: var(--space-md);
+      }
+    }
+
+    @media (max-width: 768px) {
       .preview-container {
         max-width: 90vw;
         max-height: 90vw;
