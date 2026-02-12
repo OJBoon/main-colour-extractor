@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Extractor</title>
+  <style>
+    /* ============================================
+       CSS VARIABLES & DESIGN TOKENS
+       ============================================ */
+    :root {
+      /* Colors */
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f7;
+      --bg-tertiary: #fafafa;
+      --border-light: rgba(0, 0, 0, 0.08);
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --accent: #007aff;
+      --accent-hover: #0051d5;
+
+      /* Spacing (8px base) */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-xxl: 48px;
+
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+      /* Border radius */
+      --radius-sm: 8px;
+      --radius-md: 10px;
+      --radius-lg: 12px;
+    }
+
+    /* ============================================
+       RESET & BASE STYLES
+       ============================================ */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    /* ============================================
+       LAYOUT STYLES
+       ============================================ */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+      padding: 0 var(--space-lg);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      height: calc(100vh - 64px);
+    }
+
+    .left-panel {
+      background: var(--bg-primary);
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+      border-right: 1px solid var(--border-light);
+      overflow-y: auto;
+    }
+
+    .right-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl);
+      min-height: 100%;
+    }
+
+    /* ============================================
+       COMPONENT STYLES
+       ============================================ */
+
+    /* Language Toggle */
+    .lang-toggle {
+      padding: 8px 16px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-toggle:hover {
+      background: var(--bg-secondary);
+      border-color: var(--accent);
+    }
+
+    /* Upload Zone */
+    .upload-section {
+      margin-bottom: var(--space-md);
+    }
+
+    .upload-zone {
+      border: 2px dashed #d2d2d7;
+      border-radius: var(--radius-lg);
+      background: var(--bg-tertiary);
+      padding: var(--space-xxl) var(--space-xl);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+    }
+
+    .upload-zone:hover {
+      border-color: var(--accent);
+      background: #f5f9ff;
+    }
+
+    .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: #e6f2ff;
+      border-style: solid;
+    }
+
+    .upload-zone.has-image {
+      padding: var(--space-md);
+      min-height: auto;
+    }
+
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      stroke: var(--text-secondary);
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    .upload-zone.drag-over .upload-icon {
+      stroke: var(--accent);
+    }
+
+    .upload-zone p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .upload-thumbnail {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .upload-filename {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      word-break: break-all;
+    }
+
+    .change-image-btn {
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .change-image-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* Control Groups */
+    .controls-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .control-group label {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-value {
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* Sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: #e5e5e7;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:active {
+      transform: scale(0.95);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    /* Segmented Control */
+    .segmented-control {
+      display: inline-flex;
+      gap: 6px;
+      background: #f5f5f5;
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid #e5e5e5;
+    }
+
+    .segmented-control button {
+      padding: 6px 12px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      background: transparent;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-primary);
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .segmented-control button:hover:not(.active) {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .segmented-control button.active {
+      background: #fff;
+      border-color: #ddd;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Color Info Display */
+    .color-info {
+      display: flex;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      align-items: center;
+    }
+
+    .color-swatch {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-sm);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+      background: #cccccc;
+      flex-shrink: 0;
+    }
+
+    .color-values {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      flex: 1;
+    }
+
+    .color-values p {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    /* Primary Button */
+    .btn-primary {
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-hover) 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      font-family: inherit;
+      margin-top: auto;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Preview Canvas */
+    .preview-container {
+      max-width: 600px;
+      max-height: 600px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #previewCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      background: var(--bg-tertiary);
+    }
+
+    .preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-lg);
+      background: var(--bg-tertiary);
+      border: 2px dashed #d2d2d7;
+    }
+
+    .preview-placeholder svg {
+      width: 64px;
+      height: 64px;
+      stroke: var(--text-secondary);
+      stroke-width: 1.5;
+      fill: none;
+      opacity: 0.5;
+    }
+
+    .preview-placeholder p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    /* ============================================
+       RESPONSIVE STYLES
+       ============================================ */
+    @media (max-width: 768px) {
+      .app-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .left-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .preview-container {
+        max-width: 90vw;
+        max-height: 90vw;
+      }
+    }
+
+    /* ============================================
+       UTILITY CLASSES
+       ============================================ */
+    .hidden {
+      display: none !important;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <h1 data-i18n="appTitle">Color Extractor</h1>
+    <button id="langToggle" class="lang-toggle">中</button>
+  </header>
+
+  <!-- Main Split Layout -->
+  <main class="app-container">
+    <!-- Left Panel: Controls -->
+    <aside class="left-panel">
+      <section class="upload-section">
+        <div id="uploadZone" class="upload-zone">
+          <svg class="upload-icon" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <p data-i18n="uploadPrompt">Click or drag to upload image</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" hidden>
+      </section>
+
+      <section class="controls-section">
+        <!-- Brightness Slider -->
+        <div class="control-group">
+          <label>
+            <span data-i18n="brightness">Brightness</span>
+            <span id="brightnessValue" class="control-value">0.06</span>
+          </label>
+          <input type="range" id="brightnessSlider" min="0.01" max="0.20" step="0.01" value="0.06">
+        </div>
+
+        <!-- Gradient Height Slider -->
+        <div class="control-group">
+          <label>
+            <span data-i18n="gradientHeight">Gradient Height</span>
+            <span id="gradientValue" class="control-value">33%</span>
+          </label>
+          <input type="range" id="gradientSlider" min="0" max="100" step="1" value="33">
+        </div>
+
+        <!-- Contrast Segmented Control -->
+        <div class="control-group">
+          <label>
+            <span data-i18n="contrast">Contrast</span>
+          </label>
+          <div class="segmented-control" id="contrastControl">
+            <button data-value="4.5">AA 4.5</button>
+            <button data-value="6.0" class="active">6.0</button>
+            <button data-value="7.0">AAA 7.0</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Color Info Display -->
+      <section class="color-info">
+        <div class="color-swatch" id="colorSwatch"></div>
+        <div class="color-values">
+          <p id="hexValue">#CCCCCC</p>
+          <p id="rgbValue">RGB(204, 204, 204)</p>
+        </div>
+      </section>
+
+      <!-- Export Button -->
+      <button id="exportBtn" class="btn-primary" disabled>
+        <span data-i18n="exportButton">Export Image</span>
+      </button>
+    </aside>
+
+    <!-- Right Panel: Preview -->
+    <section class="right-panel">
+      <div class="preview-container">
+        <canvas id="previewCanvas" class="hidden"></canvas>
+        <div id="previewPlaceholder" class="preview-placeholder">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <p data-i18n="previewPlaceholder">Upload an image to preview</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Hidden canvas for color extraction -->
+  <canvas id="extractionCanvas" style="display:none"></canvas>
+
+  <script>
+    // ============================================
+    // CONSTANTS & CONFIGURATION
+    // ============================================
+    const EXPORT_SIZE = 1200;
+    const MAX_PREVIEW_SIZE = 600;
+    const DEBOUNCE_DELAY = 150;
+
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    const appState = {
+      currentImage: null,
+      imageFileName: '',
+      dominantColor: null,
+      normalizedColor: null,
+      brightness: 0.06,
+      gradientHeight: 33,
+      contrastRatio: 6.0,
+      currentLanguage: localStorage.getItem('language') || 'en',
+      canExport: false
+    };
+
+    function updateState(changes) {
+      Object.assign(appState, changes);
+    }
+
+    // ============================================
+    // INTERNATIONALIZATION
+    // ============================================
+    const i18n = {
+      en: {
+        appTitle: 'Color Extractor',
+        uploadPrompt: 'Click or drag to upload image',
+        brightness: 'Brightness',
+        gradientHeight: 'Gradient Height',
+        contrast: 'Contrast',
+        exportButton: 'Export Image',
+        previewPlaceholder: 'Upload an image to preview',
+        changeImage: 'Change image'
+      },
+      zh: {
+        appTitle: '提取图片主色',
+        uploadPrompt: '点击或拖拽上传图片',
+        brightness: '亮度',
+        gradientHeight: '渐变高度',
+        contrast: '对比度',
+        exportButton: '导出图片',
+        previewPlaceholder: '上传图片以预览',
+        changeImage: '更换图片'
+      }
+    };
+
+    function t(key) {
+      return i18n[appState.currentLanguage][key] || key;
+    }
+
+    function updateAllTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        el.textContent = t(key);
+      });
+    }
+
+    // ============================================
+    // COLOR EXTRACTION ALGORITHM
+    // ============================================
+    function clamp(v) {
+      return Math.max(0, Math.min(255, v));
+    }
+
+    function srgbToLinear(c) {
+      const v = c / 255;
+      return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    }
+
+    function linearToSrgb(v) {
+      return v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+    }
+
+    function normalizeForWhiteContrast(r, g, b, targetL = 0.10, minRatio = 6.0) {
+      let Rlin = srgbToLinear(r), Glin = srgbToLinear(g), Blin = srgbToLinear(b);
+      let L = 0.2126 * Rlin + 0.7152 * Glin + 0.0722 * Blin;
+      const Lmax = Math.max(0, Math.min(1, (1.05 / minRatio) - 0.05));
+      const desired = Math.min(targetL, Lmax);
+
+      if (L === 0) {
+        Rlin = desired;
+        Glin = desired;
+        Blin = desired;
+      } else {
+        const k = desired / L;
+        Rlin = Math.min(1, Rlin * k);
+        Glin = Math.min(1, Glin * k);
+        Blin = Math.min(1, Blin * k);
+      }
+
+      const R = clamp(Math.round(linearToSrgb(Rlin) * 255));
+      const G = clamp(Math.round(linearToSrgb(Glin) * 255));
+      const B = clamp(Math.round(linearToSrgb(Blin) * 255));
+
+      return { r: R, g: G, b: B };
+    }
+
+    function rgbToHsv(r, g, b) {
+      const rr = r / 255, gg = g / 255, bb = b / 255;
+      const max = Math.max(rr, gg, bb), min = Math.min(rr, gg, bb);
+      const d = max - min;
+      let h = 0;
+
+      if (d !== 0) {
+        switch (max) {
+          case rr: h = ((gg - bb) / d) % 6; break;
+          case gg: h = (bb - rr) / d + 2; break;
+          case bb: h = (rr - gg) / d + 4; break;
+        }
+        h *= 60;
+        if (h < 0) h += 360;
+      }
+
+      const s = max === 0 ? 0 : d / max;
+      const v = max;
+
+      return { h, s, v };
+    }
+
+    function isNearBlackWhite(r, g, b) {
+      const { s, v } = rgbToHsv(r, g, b);
+      if (v < 0.05) return true;
+      if (v > 0.95 && s < 0.1) return true;
+      return false;
+    }
+
+    function hsvDist(a, b) {
+      const d = Math.abs(a - b);
+      return Math.min(d, 360 - d);
+    }
+
+    function estimateBorderMargins(w, h, data) {
+      const stripX = Math.max(1, Math.floor(w * 0.02));
+      const stripY = Math.max(1, Math.floor(h * 0.02));
+
+      function stripMetrics(x0, y0, x1, y1) {
+        let n = 0, sSum = 0, nearBW = 0;
+        const stepX = Math.max(1, Math.floor((x1 - x0) / 32));
+        const stepY = Math.max(1, Math.floor((y1 - y0) / 32));
+
+        for (let y = y0; y < y1; y += stepY) {
+          for (let x = x0; x < x1; x += stepX) {
+            const idx = (y * w + x) * 4;
+            const r = data[idx], g = data[idx + 1], b = data[idx + 2], a = data[idx + 3];
+            if (a < 64) continue;
+            const hsv = rgbToHsv(r, g, b);
+            sSum += hsv.s;
+            if (isNearBlackWhite(r, g, b)) nearBW++;
+            n++;
+          }
+        }
+
+        const sAvg = n ? sSum / n : 0;
+        const bwRatio = n ? nearBW / n : 1;
+        return { sAvg, bwRatio };
+      }
+
+      const top = stripMetrics(0, 0, w, stripY);
+      const bottom = stripMetrics(0, h - stripY, w, h);
+      const left = stripMetrics(0, 0, stripX, h);
+      const right = stripMetrics(w - stripX, 0, w, h);
+
+      const mTop = (top.sAvg < 0.08 || top.bwRatio > 0.6) ? Math.floor(h * 0.04) : 0;
+      const mBottom = (bottom.sAvg < 0.08 || bottom.bwRatio > 0.6) ? Math.floor(h * 0.04) : 0;
+      const mLeft = (left.sAvg < 0.08 || left.bwRatio > 0.6) ? Math.floor(w * 0.04) : 0;
+      const mRight = (right.sAvg < 0.08 || right.bwRatio > 0.6) ? Math.floor(w * 0.04) : 0;
+
+      return { mTop, mBottom, mLeft, mRight };
+    }
+
+    function rgbToLab(r, g, b) {
+      const R = srgbToLinear(r), G = srgbToLinear(g), B = srgbToLinear(b);
+      const X = (0.4124 * R + 0.3576 * G + 0.1805 * B) * 100;
+      const Y = (0.2126 * R + 0.7152 * G + 0.0722 * B) * 100;
+      const Z = (0.0193 * R + 0.1192 * G + 0.9505 * B) * 100;
+      const Xn = 95.047, Yn = 100.0, Zn = 108.883;
+
+      function fXYZ(t) {
+        return t > 0.008856 ? Math.cbrt(t) : (7.787 * t + 16 / 116);
+      }
+
+      const fx = fXYZ(X / Xn), fy = fXYZ(Y / Yn), fz = fXYZ(Z / Zn);
+
+      return { L: 116 * fy - 16, a: 500 * (fx - fy), b: 200 * (fy - fz) };
+    }
+
+    function labToRgb(L, a, b) {
+      const Yn = 100.0, Xn = 95.047, Zn = 108.883;
+      const fy = (L + 16) / 116, fx = a / 500 + fy, fz = fy - b / 200;
+
+      function invf(t) {
+        const t3 = t * t * t;
+        return t3 > 0.008856 ? t3 : (t - 16 / 116) / 7.787;
+      }
+
+      const xr = invf(fx), yr = invf(fy), zr = invf(fz);
+      const X = xr * Xn, Y = yr * Yn, Z = zr * Zn;
+
+      let Rlin = X / 100 * 3.2406 + Y / 100 * -1.5372 + Z / 100 * -0.4986;
+      let Glin = X / 100 * -0.9689 + Y / 100 * 1.8758 + Z / 100 * 0.0415;
+      let Blin = X / 100 * 0.0557 + Y / 100 * -0.2040 + Z / 100 * 1.0570;
+
+      function gamma(v) {
+        return v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+      }
+
+      const R = clamp(Math.round(gamma(Rlin) * 255));
+      const G = clamp(Math.round(gamma(Glin) * 255));
+      const B = clamp(Math.round(gamma(Blin) * 255));
+
+      return { r: R, g: G, b: B };
+    }
+
+    function extractDominantColor(img) {
+      const canvas = document.getElementById('extractionCanvas');
+      const w = Math.min(img.naturalWidth, 800);
+      const h = Math.floor(img.naturalHeight * (w / img.naturalWidth));
+      canvas.width = w;
+      canvas.height = h;
+
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0, w, h);
+      const { data } = ctx.getImageData(0, 0, w, h);
+
+      const target = 30000;
+      const step = Math.max(1, Math.floor((w * h) / target));
+      const samples = [];
+      const { mTop, mBottom, mLeft, mRight } = estimateBorderMargins(w, h, data);
+      const hueBins = new Array(36).fill(0);
+
+      for (let i = 0; i < data.length; i += 4 * step) {
+        const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+        if (a < 64) continue;
+
+        const idxPix = i / 4;
+        const y = Math.floor(idxPix / w);
+        const x = idxPix % w;
+
+        if (y < mTop || y >= h - mBottom || x < mLeft || x >= w - mRight) continue;
+        if (isNearBlackWhite(r, g, b)) continue;
+
+        const hsv = rgbToHsv(r, g, b);
+        if (hsv.s < 0.12 || hsv.v < 0.10 || hsv.v > 0.95) continue;
+
+        const wgt = Math.max(0.0001, hsv.s * hsv.s);
+        samples.push({ r, g, b, lab: rgbToLab(r, g, b), w: wgt, h: hsv.h });
+        const bin = Math.floor(hsv.h / 10);
+        hueBins[bin] += wgt;
+      }
+
+      if (samples.length === 0) return { r: 128, g: 128, b: 128 };
+
+      // Hue peak selection
+      const peakIdx = hueBins.reduce((p, cur, i) => cur > hueBins[p] ? i : p, 0);
+      const peakHue = peakIdx * 10 + 5;
+      const band = samples.filter(s => hsvDist(s.h, peakHue) <= 12);
+
+      if (band.length >= 400) {
+        let L = 0, A = 0, B = 0, W = 0;
+        for (const s of band) {
+          L += s.lab.L * s.w;
+          A += s.lab.a * s.w;
+          B += s.lab.b * s.w;
+          W += s.w;
+        }
+        const lab = { L: L / W, a: A / W, b: B / W };
+        return labToRgb(lab.L, lab.a, lab.b);
+      }
+
+      // K-means clustering
+      const k = Math.min(8, Math.max(3, Math.floor(Math.sqrt(samples.length / 500))));
+      const centers = initCentersKMeansPP(samples, k);
+      const maxIter = 10;
+      let assignments = new Array(samples.length).fill(0);
+
+      for (let iter = 0; iter < maxIter; iter++) {
+        for (let i = 0; i < samples.length; i++) {
+          let best = 0, bestDist = Infinity;
+          const s = samples[i].lab;
+          for (let c = 0; c < centers.length; c++) {
+            const cc = centers[c];
+            const d = (s.L - cc.L) ** 2 + (s.a - cc.a) ** 2 + (s.b - cc.b) ** 2;
+            if (d < bestDist) {
+              bestDist = d;
+              best = c;
+            }
+          }
+          assignments[i] = best;
+        }
+
+        const acc = centers.map(() => ({ L: 0, a: 0, b: 0, w: 0 }));
+        for (let i = 0; i < samples.length; i++) {
+          const s = samples[i].lab;
+          const idx = assignments[i];
+          const wgt = samples[i].w;
+          acc[idx].L += s.L * wgt;
+          acc[idx].a += s.a * wgt;
+          acc[idx].b += s.b * wgt;
+          acc[idx].w += wgt;
+        }
+
+        for (let c = 0; c < centers.length; c++) {
+          if (acc[c].w > 0) {
+            centers[c] = {
+              L: acc[c].L / acc[c].w,
+              a: acc[c].a / acc[c].w,
+              b: acc[c].b / acc[c].w
+            };
+          }
+        }
+      }
+
+      const counts = centers.map(() => 0);
+      for (let i = 0; i < assignments.length; i++) {
+        counts[assignments[i]] += samples[i].w;
+      }
+
+      const order = centers.map((_, i) => i).sort((a, b) => counts[b] - counts[a]);
+
+      for (const idx of order) {
+        const rgb = labToRgb(centers[idx].L, centers[idx].a, centers[idx].b);
+        if (!isNearBlackWhite(rgb.r, rgb.g, rgb.b)) return rgb;
+      }
+
+      const i0 = order[0];
+      return labToRgb(centers[i0].L, centers[i0].a, centers[i0].b);
+    }
+
+    function initCentersKMeansPP(points, k) {
+      const cs = [];
+      cs.push(points[Math.floor(Math.random() * points.length)].lab);
+
+      while (cs.length < k) {
+        const dists = points.map(p => {
+          let minD = Infinity;
+          const s = p.lab;
+          for (const c of cs) {
+            const d = (s.L - c.L) ** 2 + (s.a - c.a) ** 2 + (s.b - c.b) ** 2;
+            if (d < minD) minD = d;
+          }
+          return minD;
+        });
+
+        const sum = dists.reduce((a, b) => a + b, 0);
+        let r = Math.random() * sum;
+        let idx = 0;
+
+        for (let i = 0; i < dists.length; i++) {
+          r -= dists[i];
+          if (r <= 0) {
+            idx = i;
+            break;
+          }
+        }
+
+        cs.push(points[idx].lab);
+      }
+
+      return cs;
+    }
+
+    // ============================================
+    // PREVIEW RENDERING
+    // ============================================
+    function drawImageCover(ctx, img, x, y, width, height) {
+      const imgRatio = img.width / img.height;
+      const containerRatio = width / height;
+
+      let drawWidth, drawHeight, offsetX, offsetY;
+
+      if (imgRatio > containerRatio) {
+        drawHeight = height;
+        drawWidth = height * imgRatio;
+        offsetX = (width - drawWidth) / 2;
+        offsetY = 0;
+      } else {
+        drawWidth = width;
+        drawHeight = width / imgRatio;
+        offsetX = 0;
+        offsetY = (height - drawHeight) / 2;
+      }
+
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    }
+
+    function renderPreview() {
+      const canvas = document.getElementById('previewCanvas');
+      const placeholder = document.getElementById('previewPlaceholder');
+
+      if (!appState.currentImage) {
+        canvas.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        return;
+      }
+
+      canvas.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+
+      const ctx = canvas.getContext('2d');
+      const container = canvas.parentElement;
+
+      // Set canvas size (1:1 aspect ratio)
+      const size = Math.min(container.clientWidth, MAX_PREVIEW_SIZE);
+      canvas.width = size;
+      canvas.height = size;
+
+      // Draw image (cover fit)
+      drawImageCover(ctx, appState.currentImage, 0, 0, size, size);
+
+      // Draw gradient overlay
+      if (appState.normalizedColor) {
+        const { r, g, b } = appState.normalizedColor;
+        const gradientHeight = appState.gradientHeight / 100;
+        const gradientStart = size * (1 - gradientHeight);
+
+        const gradient = ctx.createLinearGradient(0, gradientStart, 0, size);
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, gradientStart, size, size - gradientStart);
+      }
+
+      // Enable export
+      updateState({ canExport: true });
+      document.getElementById('exportBtn').disabled = false;
+    }
+
+    function updateColorInfo(color) {
+      const hex = `#${((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1).toUpperCase()}`;
+      document.getElementById('hexValue').textContent = hex;
+      document.getElementById('rgbValue').textContent = `RGB(${color.r}, ${color.g}, ${color.b})`;
+      document.getElementById('colorSwatch').style.backgroundColor = hex;
+    }
+
+    function extractAndNormalize() {
+      if (!appState.currentImage) return;
+
+      // Extract dominant color
+      const dominantColor = extractDominantColor(appState.currentImage);
+
+      // Normalize for brightness and contrast
+      const normalizedColor = normalizeForWhiteContrast(
+        dominantColor.r,
+        dominantColor.g,
+        dominantColor.b,
+        appState.brightness,
+        appState.contrastRatio
+      );
+
+      updateState({ dominantColor, normalizedColor });
+      updateColorInfo(normalizedColor);
+      renderPreview();
+    }
+
+    // ============================================
+    // UPLOAD FUNCTIONALITY
+    // ============================================
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+
+    function updateUploadZone(hasImage) {
+      if (hasImage) {
+        uploadZone.classList.add('has-image');
+        uploadZone.innerHTML = `
+          <img src="${appState.currentImage.src}" alt="Uploaded" class="upload-thumbnail">
+          <div class="upload-filename">${appState.imageFileName}</div>
+          <a class="change-image-btn" data-i18n="changeImage">${t('changeImage')}</a>
+        `;
+        uploadZone.querySelector('.change-image-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          fileInput.click();
+        });
+      } else {
+        uploadZone.classList.remove('has-image');
+        uploadZone.innerHTML = `
+          <svg class="upload-icon" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <p data-i18n="uploadPrompt">${t('uploadPrompt')}</p>
+        `;
+      }
+    }
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files[0]) {
+        handleImageUpload(e.target.files[0]);
+      }
+    });
+
+    // Drag and drop
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('drag-over');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('drag-over');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) {
+        handleImageUpload(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleImageUpload(file) {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        updateState({
+          currentImage: img,
+          imageFileName: file.name,
+          canExport: false
+        });
+        updateUploadZone(true);
+        extractAndNormalize();
+      };
+    }
+
+    // ============================================
+    // SLIDER EVENT HANDLERS
+    // ============================================
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+      };
+    }
+
+    const debouncedExtract = debounce(extractAndNormalize, DEBOUNCE_DELAY);
+
+    document.getElementById('brightnessSlider').addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
+      document.getElementById('brightnessValue').textContent = value.toFixed(2);
+      updateState({ brightness: value });
+      debouncedExtract();
+    });
+
+    document.getElementById('gradientSlider').addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      document.getElementById('gradientValue').textContent = `${value}%`;
+      updateState({ gradientHeight: value });
+      renderPreview();
+    });
+
+    // Contrast control
+    document.getElementById('contrastControl').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      document.querySelectorAll('#contrastControl button').forEach(b => {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+
+      updateState({ contrastRatio: parseFloat(btn.dataset.value) });
+      extractAndNormalize();
+    });
+
+    // ============================================
+    // EXPORT FUNCTIONALITY
+    // ============================================
+    document.getElementById('exportBtn').addEventListener('click', exportImage);
+
+    function exportImage() {
+      if (!appState.currentImage || !appState.normalizedColor) return;
+
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = EXPORT_SIZE;
+      exportCanvas.height = EXPORT_SIZE;
+      const ctx = exportCanvas.getContext('2d');
+
+      // Draw image at high resolution
+      drawImageCover(ctx, appState.currentImage, 0, 0, EXPORT_SIZE, EXPORT_SIZE);
+
+      // Draw gradient
+      const { r, g, b } = appState.normalizedColor;
+      const gradientHeight = appState.gradientHeight / 100;
+      const gradientStart = EXPORT_SIZE * (1 - gradientHeight);
+
+      const gradient = ctx.createLinearGradient(0, gradientStart, 0, EXPORT_SIZE);
+      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, gradientStart, EXPORT_SIZE, EXPORT_SIZE - gradientStart);
+
+      // Download
+      exportCanvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `color-export-${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    }
+
+    // ============================================
+    // LANGUAGE TOGGLE
+    // ============================================
+    document.getElementById('langToggle').addEventListener('click', () => {
+      appState.currentLanguage = appState.currentLanguage === 'en' ? 'zh' : 'en';
+      document.getElementById('langToggle').textContent = appState.currentLanguage === 'en' ? '中' : 'EN';
+      updateAllTranslations();
+      updateUploadZone(appState.currentImage !== null);
+      localStorage.setItem('language', appState.currentLanguage);
+    });
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    function init() {
+      // Set initial language
+      if (appState.currentLanguage === 'zh') {
+        document.getElementById('langToggle').textContent = 'EN';
+        document.documentElement.lang = 'zh';
+      }
+      updateAllTranslations();
+
+      // Initialize preview
+      renderPreview();
+    }
+
+    init();
+  </script>
+</body>
+</html>
