@@ -447,6 +447,12 @@
       flex: 1;
     }
 
+    .color-value-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
     .color-values p {
       margin: 0;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace;
@@ -454,22 +460,32 @@
       color: var(--text-primary);
       padding: 6px 10px;
       border-radius: var(--radius-sm);
+      flex: 1;
+    }
+
+    .color-copy-btn {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s ease;
-      user-select: none;
+      white-space: nowrap;
     }
 
-    .color-values p:hover {
-      background: var(--bg-secondary);
-    }
-
-    .color-values p:active {
-      transform: scale(0.98);
-    }
-
-    .color-values p.copied {
+    .color-copy-btn:hover {
       background: var(--accent);
       color: white;
+      border-color: var(--accent);
+    }
+
+    .color-copy-btn.copied {
+      background: #34c759;
+      color: white;
+      border-color: #34c759;
     }
 
     /* Primary Button */
@@ -552,6 +568,39 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    }
+
+    .code-format-control {
+      display: flex;
+      gap: 4px;
+      background: #f5f5f5;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid #e5e5e5;
+      margin-bottom: var(--space-sm);
+    }
+
+    .code-format-control button {
+      padding: 4px 10px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      background: transparent;
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--text-primary);
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .code-format-control button:hover:not(.active) {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .code-format-control button.active {
+      background: #fff;
+      border-color: #ddd;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
     .css-copy-btn {
@@ -793,15 +842,27 @@
       <section class="color-info">
         <div class="color-swatch" id="colorSwatch"></div>
         <div class="color-values">
-          <p id="hexValue">#CCCCCC</p>
-          <p id="rgbValue">RGB(204, 204, 204)</p>
+          <div class="color-value-row">
+            <p id="hexValue">#CCCCCC</p>
+            <button class="color-copy-btn" data-copy-target="hexValue">Copy</button>
+          </div>
+          <div class="color-value-row">
+            <p id="rgbValue">RGB(204, 204, 204)</p>
+            <button class="color-copy-btn" data-copy-target="rgbValue">Copy</button>
+          </div>
         </div>
       </section>
 
       <!-- CSS Code Preview -->
       <div class="css-preview" id="cssPreview" style="display: none;">
+        <div class="code-format-control" id="codeFormatControl">
+          <button data-format="css" class="active">CSS</button>
+          <button data-format="react">React</button>
+          <button data-format="swift">Swift</button>
+          <button data-format="compose">Compose</button>
+        </div>
         <div class="css-preview-header">
-          <span class="css-preview-label">CSS Gradient</span>
+          <span class="css-preview-label" id="codeLabel">CSS Gradient</span>
           <button id="cssCopyBtn" class="css-copy-btn">Copy</button>
         </div>
         <pre class="css-code" id="cssCode"></pre>
@@ -1779,57 +1840,115 @@
       extractAndNormalize();
     });
 
-    // Color value click-to-copy handlers
-    document.getElementById('hexValue').addEventListener('click', function() {
-      const value = this.textContent;
-      navigator.clipboard.writeText(value).then(() => {
-        // Visual feedback
-        this.classList.add('copied');
-        setTimeout(() => this.classList.remove('copied'), 1000);
+    // Color value copy button handlers
+    document.querySelectorAll('.color-copy-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const targetId = this.dataset.copyTarget;
+        const value = document.getElementById(targetId).textContent;
+        navigator.clipboard.writeText(value).then(() => {
+          // Visual feedback
+          const originalText = this.textContent;
+          this.textContent = 'Copied!';
+          this.classList.add('copied');
+          setTimeout(() => {
+            this.textContent = originalText;
+            this.classList.remove('copied');
+          }, 1500);
+        });
       });
     });
 
-    document.getElementById('rgbValue').addEventListener('click', function() {
-      const value = this.textContent;
-      navigator.clipboard.writeText(value).then(() => {
-        // Visual feedback
-        this.classList.add('copied');
-        setTimeout(() => this.classList.remove('copied'), 1000);
-      });
-    });
+    // Code Preview functionality
+    let currentCodeFormat = 'css';
 
-    // CSS Preview functionality
-    function generateCSSGradient() {
+    function generateCode(format = 'css') {
       if (!appState.normalizedColor) return '';
 
       const { r, g, b } = appState.normalizedColor;
       const height = appState.gradientHeight;
       const startPos = 100 - height;
 
-      return `background: linear-gradient(
+      switch (format) {
+        case 'css':
+          return `background: linear-gradient(
   180deg,
   rgba(${r}, ${g}, ${b}, 0) ${startPos}%,
   rgba(${r}, ${g}, ${b}, 1) 100%
 );`;
+
+        case 'react':
+          return `const gradientStyle = {
+  background: \`linear-gradient(
+    180deg,
+    rgba(${r}, ${g}, ${b}, 0) ${startPos}%,
+    rgba(${r}, ${g}, ${b}, 1) 100%
+  )\`
+};`;
+
+        case 'swift':
+          return `let gradient = CAGradientLayer()
+gradient.colors = [
+  UIColor(red: ${(r/255).toFixed(3)}, green: ${(g/255).toFixed(3)}, blue: ${(b/255).toFixed(3)}, alpha: 0).cgColor,
+  UIColor(red: ${(r/255).toFixed(3)}, green: ${(g/255).toFixed(3)}, blue: ${(b/255).toFixed(3)}, alpha: 1).cgColor
+]
+gradient.locations = [${(startPos/100).toFixed(2)}, 1.0]
+gradient.startPoint = CGPoint(x: 0.5, y: 0)
+gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
+
+        case 'compose':
+          return `val gradient = Brush.verticalGradient(
+  ${(startPos/100).toFixed(2)}f to Color(${r}, ${g}, ${b}, 0),
+  1.0f to Color(${r}, ${g}, ${b}, 255)
+)`;
+
+        default:
+          return '';
+      }
+    }
+
+    function getCodeLabel(format) {
+      const labels = {
+        'css': 'CSS Gradient',
+        'react': 'React Style',
+        'swift': 'Swift UIKit',
+        'compose': 'Jetpack Compose'
+      };
+      return labels[format] || 'Code';
     }
 
     function updateCSSPreview() {
       const cssPreview = document.getElementById('cssPreview');
       const cssCode = document.getElementById('cssCode');
+      const codeLabel = document.getElementById('codeLabel');
 
       if (!appState.normalizedColor) {
         cssPreview.style.display = 'none';
         return;
       }
 
-      const css = generateCSSGradient();
-      cssCode.textContent = css;
+      const code = generateCode(currentCodeFormat);
+      cssCode.textContent = code;
+      codeLabel.textContent = getCodeLabel(currentCodeFormat);
       cssPreview.style.display = 'block';
     }
 
+    // Code format selector
+    document.getElementById('codeFormatControl').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      document.querySelectorAll('#codeFormatControl button').forEach(b => {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+
+      currentCodeFormat = btn.dataset.format;
+      updateCSSPreview();
+    });
+
     document.getElementById('cssCopyBtn').addEventListener('click', () => {
-      const css = generateCSSGradient();
-      navigator.clipboard.writeText(css).then(() => {
+      const code = generateCode(currentCodeFormat);
+      navigator.clipboard.writeText(code).then(() => {
         // Show feedback
         const btn = document.getElementById('cssCopyBtn');
         const originalText = btn.textContent;
