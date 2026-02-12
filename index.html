@@ -527,6 +527,67 @@
       cursor: not-allowed;
     }
 
+    /* CSS Code Preview */
+    .css-preview {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      position: relative;
+      margin-bottom: var(--space-md);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace;
+    }
+
+    .css-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+    }
+
+    .css-preview-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    }
+
+    .css-copy-btn {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    }
+
+    .css-copy-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .css-copy-btn.copied {
+      background: #34c759;
+      color: white;
+      border-color: #34c759;
+    }
+
+    .css-code {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 0;
+    }
+
     /* Preview Canvas */
     .preview-container {
       max-width: 600px;
@@ -737,10 +798,14 @@
         </div>
       </section>
 
-      <!-- CSS Export Button -->
-      <button id="exportCSSBtn" class="btn-secondary" disabled>
-        <span data-i18n="exportCSS">Export CSS</span>
-      </button>
+      <!-- CSS Code Preview -->
+      <div class="css-preview" id="cssPreview" style="display: none;">
+        <div class="css-preview-header">
+          <span class="css-preview-label">CSS Gradient</span>
+          <button id="cssCopyBtn" class="css-copy-btn">Copy</button>
+        </div>
+        <pre class="css-code" id="cssCode"></pre>
+      </div>
 
       <!-- Export Button -->
       <button id="exportBtn" class="btn-primary" disabled>
@@ -1501,10 +1566,10 @@
         await renderTextOverlay(ctx, size);
       }
 
-      // Enable export
+      // Enable export and update CSS preview
       updateState({ canExport: true });
       document.getElementById('exportBtn').disabled = false;
-      document.getElementById('exportCSSBtn').disabled = false;
+      updateCSSPreview();
     }
 
     function updateColorInfo(color) {
@@ -1591,7 +1656,7 @@
       });
       updateUploadZone(false);
       document.getElementById('exportBtn').disabled = true;
-      document.getElementById('exportCSSBtn').disabled = true;
+      document.getElementById('cssPreview').style.display = 'none';
       renderPreview();
     }
 
@@ -1733,7 +1798,7 @@
       });
     });
 
-    // CSS Export functionality
+    // CSS Preview functionality
     function generateCSSGradient() {
       if (!appState.normalizedColor) return '';
 
@@ -1748,15 +1813,31 @@
 );`;
     }
 
-    document.getElementById('exportCSSBtn').addEventListener('click', () => {
+    function updateCSSPreview() {
+      const cssPreview = document.getElementById('cssPreview');
+      const cssCode = document.getElementById('cssCode');
+
+      if (!appState.normalizedColor) {
+        cssPreview.style.display = 'none';
+        return;
+      }
+
+      const css = generateCSSGradient();
+      cssCode.textContent = css;
+      cssPreview.style.display = 'block';
+    }
+
+    document.getElementById('cssCopyBtn').addEventListener('click', () => {
       const css = generateCSSGradient();
       navigator.clipboard.writeText(css).then(() => {
         // Show feedback
-        const btn = document.getElementById('exportCSSBtn');
-        const originalText = btn.querySelector('span').textContent;
-        btn.querySelector('span').textContent = 'Copied!';
+        const btn = document.getElementById('cssCopyBtn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
         setTimeout(() => {
-          btn.querySelector('span').textContent = originalText;
+          btn.textContent = originalText;
+          btn.classList.remove('copied');
         }, 1500);
       });
     });
