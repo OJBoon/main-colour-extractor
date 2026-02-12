@@ -163,7 +163,7 @@
       justify-content: center;
       align-items: center;
       height: 52px;
-      padding: 0 var(--space-lg);
+      padding: 0 var(--space-md);
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(40px) saturate(180%);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -187,7 +187,8 @@
       display: flex;
       gap: var(--space-md);
       padding: var(--space-md);
-      height: calc(100vh - 52px - var(--space-md) * 3); /* Header (52px) + header top margin (24px) + container top padding (24px) + container bottom padding (24px) = 124px */
+      margin-bottom: 0;
+      height: calc(100vh - 76px - var(--space-md)); /* Header + header margin (52px + 24px = 76px) + container top padding (24px) = 100px total, leaving 24px at bottom from container's padding */
     }
 
     .left-panel {
@@ -274,7 +275,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--space-md);
+      padding: 0 var(--space-md); /* No top/bottom padding, only left/right */
     }
 
     /* ============================================
@@ -300,16 +301,9 @@
     }
 
     /* Header Controls */
-    .history-controls {
-      position: absolute;
-      left: var(--space-lg);
-      display: flex;
-      gap: var(--space-xs);
-    }
-
     .lang-toggle {
       position: absolute;
-      right: var(--space-lg);
+      right: var(--space-md);
     }
 
     /* Device Tabs */
@@ -468,13 +462,24 @@
     }
 
     /* Section Titles */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
     .section-title {
       font-size: 11px;
       font-weight: 600;
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: var(--space-sm);
+      margin-bottom: 16px;
+    }
+
+    .section-header .section-title {
+      margin-bottom: 0;
     }
 
     /* Section Divider */
@@ -859,6 +864,28 @@
       justify-content: center;
     }
 
+    /* Footer Credit */
+    .footer-credit {
+      position: fixed;
+      bottom: 8px;
+      right: 16px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+      z-index: 1000;
+    }
+
+    .footer-credit a {
+      color: inherit;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .footer-credit a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
     /* Device Views */
     .device-view {
       width: 100%;
@@ -866,7 +893,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--space-lg);
     }
 
     .device-view.hidden {
@@ -874,43 +900,6 @@
     }
 
     /* Reload Preview Button */
-    .reload-preview-btn {
-      position: absolute;
-      right: 120px; /* Position to the left of lang toggle */
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .reload-preview-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .reload-preview-btn:not(:disabled) {
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .reload-preview-btn:not(:disabled):hover {
-      background: rgba(0, 122, 255, 0.1);
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
-    }
-
-    .reload-preview-btn svg {
-      width: 18px;
-      height: 18px;
-    }
-
     /* Device Mockups */
     .device-mockup {
       position: relative;
@@ -924,6 +913,7 @@
     .iphone-mockup {
       position: relative;
       flex-shrink: 0;
+      transition: width 0.3s ease, height 0.3s ease;
       /* Width, height, and CSS variables set by JavaScript in calculateOptimalPreviewSize() */
     }
 
@@ -938,6 +928,7 @@
       background-size: var(--mockup-width) var(--mockup-height);
       pointer-events: none;
       z-index: 10;
+      transition: width 0.3s ease, height 0.3s ease;
     }
 
     .mac-mockup {
@@ -974,6 +965,7 @@
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       background: white; /* Always white background - no transparency */
+      transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease, border-radius 0.3s ease;
       /* All dimensions (top, left, width, height, border-radius) set by JavaScript in calculateOptimalPreviewSize() */
     }
 
@@ -1059,7 +1051,7 @@
       }
     }
 
-    .preview-placeholder svg {
+    .preview-placeholder > svg {
       width: 48px;
       height: 48px;
       stroke: var(--upload-icon-color);
@@ -1068,9 +1060,15 @@
       opacity: 0.5;
     }
 
-    .iphone-mockup .preview-placeholder svg {
+    .iphone-mockup .preview-placeholder > svg {
       width: 40px;
       height: 40px;
+    }
+
+    /* Upload icon inside preview upload zone should be 16px */
+    .preview-upload-zone .upload-icon {
+      width: 16px;
+      height: 16px;
     }
 
     .preview-placeholder p {
@@ -1087,37 +1085,34 @@
       font-size: 14px;
     }
 
-    /* Preview Upload Button - iOS Pill Style */
-    .preview-upload-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 100px; /* Fully rounded pill */
-      font-size: 13px;
-      font-weight: 600; /* Semibold */
+    /* Preview Upload Zone - matches sidebar style */
+    .preview-upload-zone {
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: none; /* No glow */
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 6px 10px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
     }
 
-    .preview-upload-btn:hover {
-      background: #0056b3;
-      transform: scale(1.02);
+    .preview-upload-zone:hover {
+      background: var(--bg-secondary);
+      border-color: var(--accent);
     }
 
-    .preview-upload-btn:active {
-      transform: scale(0.98);
+    .preview-upload-zone:hover .upload-icon {
+      stroke: var(--accent);
     }
 
-    .preview-upload-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: white;
-      opacity: 1;
+    .preview-upload-zone p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     /* ============================================
@@ -1174,19 +1169,6 @@
 <body>
   <!-- Header -->
   <header class="app-header">
-    <div class="history-controls">
-      <button id="undoBtn" class="icon-btn" title="Undo (Cmd+Z)" disabled>
-        <svg viewBox="0 0 24 24" width="20" height="20">
-          <path d="M3 7v6h6M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-      </button>
-      <button id="redoBtn" class="icon-btn" title="Redo (Cmd+Shift+Z)" disabled>
-        <svg viewBox="0 0 24 24" width="20" height="20">
-          <path d="M21 7v6h-6M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-      </button>
-    </div>
-
     <!-- Device Tabs -->
     <div class="device-tabs">
       <button class="device-tab active" data-device="iphone" title="iPhone">
@@ -1203,13 +1185,6 @@
         </svg>
       </button>
     </div>
-
-    <button id="reloadPreviewBtn" class="reload-preview-btn" disabled title="Reload Preview">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="23 4 23 10 17 10"></polyline>
-        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-      </svg>
-    </button>
 
     <button id="langToggle" class="lang-toggle">中</button>
   </header>
@@ -1242,11 +1217,11 @@
             type="text"
             id="titleInput"
             class="text-input"
-            maxlength="40"
+            maxlength="24"
             data-i18n-placeholder="titlePlaceholder"
             placeholder="Enter title"
           >
-          <span class="char-count"><span id="titleCount">0</span>/40</span>
+          <span class="char-count"><span id="titleCount">0</span>/24</span>
         </div>
 
         <div class="control-group">
@@ -1257,18 +1232,41 @@
             type="text"
             id="subtitleInput"
             class="text-input"
-            maxlength="60"
+            maxlength="50"
             data-i18n-placeholder="subtitlePlaceholder"
             placeholder="Enter subtitle"
           >
-          <span class="char-count"><span id="subtitleCount">0</span>/60</span>
+          <span class="char-count"><span id="subtitleCount">0</span>/50</span>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- Color Info Display -->
+      <section class="color-info-section">
+        <h2 class="section-title" data-i18n="colorInfo">Color Info</h2>
+        <div class="color-info">
+          <div class="color-swatch" id="colorSwatch"></div>
+          <div class="color-values">
+            <div class="color-value-row">
+              <p id="hexValue">#CCCCCC</p>
+              <button class="color-copy-btn" data-copy-target="hexValue">Copy</button>
+            </div>
+            <div class="color-value-row">
+              <p id="rgbValue">RGB(204, 204, 204)</p>
+              <button class="color-copy-btn" data-copy-target="rgbValue">Copy</button>
+            </div>
+          </div>
         </div>
       </section>
 
       <div class="section-divider"></div>
 
       <section class="controls-section">
-        <h2 class="section-title" data-i18n="colorSettings">Color Settings</h2>
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="colorSettings">Color Settings</h2>
+          <button id="resetColorSettingsBtn" class="color-copy-btn">Reset</button>
+        </div>
         <!-- Brightness Slider -->
         <div class="control-group">
           <label>
@@ -1305,26 +1303,6 @@
             <button data-value="4.5">AA 4.5</button>
             <button data-value="6.0" class="active">6.0</button>
             <button data-value="7.0">AAA 7.0</button>
-          </div>
-        </div>
-      </section>
-
-      <div class="section-divider"></div>
-
-      <!-- Color Info Display -->
-      <section class="color-info-section">
-        <h2 class="section-title" data-i18n="colorInfo">Color Info</h2>
-        <div class="color-info">
-          <div class="color-swatch" id="colorSwatch"></div>
-          <div class="color-values">
-            <div class="color-value-row">
-              <p id="hexValue">#CCCCCC</p>
-              <button class="color-copy-btn" data-copy-target="hexValue">Copy</button>
-            </div>
-            <div class="color-value-row">
-              <p id="rgbValue">RGB(204, 204, 204)</p>
-              <button class="color-copy-btn" data-copy-target="rgbValue">Copy</button>
-            </div>
           </div>
         </div>
       </section>
@@ -1373,14 +1351,14 @@
                   <circle cx="8.5" cy="8.5" r="1.5"></circle>
                   <polyline points="21 15 16 10 5 21"></polyline>
                 </svg>
-                <button class="preview-upload-btn" id="previewUploadBtnMobile">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="preview-upload-zone" id="previewUploadBtnMobile">
+                  <svg class="upload-icon" viewBox="0 0 24 24">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="17 8 12 3 7 8"></polyline>
                     <line x1="12" y1="3" x2="12" y2="15"></line>
                   </svg>
-                  <span data-i18n="uploadImage">Upload image</span>
-                </button>
+                  <p data-i18n="uploadImage">Upload image</p>
+                </div>
               </div>
 
               <!-- Skeleton Content Image -->
@@ -1408,6 +1386,13 @@
       </div>
     </section>
   </main>
+
+  <!-- Footer Credit -->
+  <footer class="footer-credit">
+    <a href="https://github.com/OJBoon/main-colour-extractor" target="_blank" rel="noopener noreferrer">
+      Created by @ollyboon
+    </a>
+  </footer>
 
   <!-- Hidden canvas for color extraction -->
   <canvas id="extractionCanvas" style="display:none"></canvas>
@@ -1567,6 +1552,7 @@
       en: {
         appTitle: 'Color Extractor',
         uploadPrompt: 'Click or drag to upload image',
+        uploadImage: 'Upload image',
         textOverlay: 'Text Overlay',
         colorSettings: 'Color Settings',
         colorInfo: 'Color Info',
@@ -1588,6 +1574,7 @@
       zh: {
         appTitle: '提取图片主色',
         uploadPrompt: '点击或拖拽上传图片',
+        uploadImage: '上传图片',
         textOverlay: '文字叠加',
         colorSettings: '颜色设置',
         colorInfo: '颜色信息',
@@ -2735,23 +2722,34 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
     }
 
     // ============================================
-    // UNDO/REDO CONTROLS
+    // RESET CONTROL
     // ============================================
-    document.getElementById('undoBtn').addEventListener('click', undo);
-    document.getElementById('redoBtn').addEventListener('click', redo);
+    // Reset Color Settings button
+    document.getElementById('resetColorSettingsBtn').addEventListener('click', () => {
+      // Reset only color settings to default
+      Object.assign(appState, {
+        brightness: 0.04,
+        gradientHeight: 33,
+        blurIntensity: 0,
+        contrastRatio: 6.0
+      });
 
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      // Cmd+Z / Ctrl+Z = Undo
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault();
-        undo();
-      }
+      // Update UI controls
+      document.getElementById('brightnessSlider').value = 0.04;
+      document.getElementById('brightnessValue').textContent = '0.04';
+      document.getElementById('gradientSlider').value = 33;
+      document.getElementById('gradientValue').textContent = '33%';
+      document.getElementById('blurSlider').value = 0;
+      document.getElementById('blurValue').textContent = '0%';
 
-      // Cmd+Shift+Z / Ctrl+Shift+Z = Redo
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
-        e.preventDefault();
-        redo();
+      // Update contrast buttons
+      document.querySelectorAll('#contrastControl button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.value === '6.0');
+      });
+
+      // Re-render preview
+      if (appState.currentImage) {
+        renderPreview();
       }
     });
 
@@ -2857,14 +2855,9 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
       const iphoneMockupAfter = iphoneMockup;
       const deviceScreen = document.querySelector('.iphone-mockup .device-screen');
 
-      // Get available height (viewport height minus header, padding, and margins)
-      const header = document.querySelector('header');
-      const headerHeight = header ? header.offsetHeight : 60;
-      const viewportHeight = window.innerHeight;
-      const headerTopMargin = 24; // var(--space-md)
-      const rightPanelPadding = 48; // 24px top + 24px bottom
-      const extraMargin = 40; // Extra space for visual breathing room
-      const availableHeight = viewportHeight - headerHeight - headerTopMargin - rightPanelPadding - extraMargin;
+      // Get available height from the actual right-panel container height
+      // This accounts for the app-container's calculated height automatically
+      const availableHeight = rightPanel.clientHeight;
 
       // Full resolution iPhone mockup dimensions (source image)
       const fullResWidth = 1380;
@@ -2924,26 +2917,25 @@ gradient.endPoint = CGPoint(x: 0.5, y: 1)`;
       console.log('Screen dimensions:', { screenWidth, screenHeight, scale, targetWidth, targetHeight, skeletonMarginTop });
     }
 
-    // Enable reload button on window resize
+    // Auto-resize on window resize with smooth animation
     let resizeTimeout;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
+
       resizeTimeout = setTimeout(() => {
-        const reloadBtn = document.getElementById('reloadPreviewBtn');
-        reloadBtn.disabled = false;
-      }, 300);
-    });
+        // Update dimensions and render simultaneously
+        // The CSS transitions on the mockup will animate smoothly
+        // while the canvas content scales with it
+        calculateOptimalPreviewSize();
 
-    // Reload preview button handler
-    document.getElementById('reloadPreviewBtn').addEventListener('click', () => {
-      const reloadBtn = document.getElementById('reloadPreviewBtn');
-      if (reloadBtn.disabled) return;
-
-      calculateOptimalPreviewSize();
-      if (appState.currentImage) {
-        renderPreview();
-      }
-      reloadBtn.disabled = true;
+        // Render immediately so canvas scales during the transition
+        if (appState.currentImage) {
+          // Use requestAnimationFrame to sync with the browser's repaint
+          requestAnimationFrame(() => {
+            renderPreview();
+          });
+        }
+      }, 300); // Wait 300ms after user stops resizing
     });
 
     // Wait for Poppins font to load before initializing
