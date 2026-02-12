@@ -93,8 +93,8 @@
     }
 
     .sidebar-header {
-      margin: 0;
-      padding: var(--space-lg) var(--space-lg) var(--space-lg);
+      margin: calc(var(--space-lg) * -1) calc(var(--space-lg) * -1) 0;
+      padding: var(--space-lg);
       flex-shrink: 0;
       position: sticky;
       top: calc(var(--space-lg) * -1);
@@ -107,7 +107,6 @@
       );
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      margin: calc(var(--space-lg) * -1) calc(var(--space-lg) * -1) 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
