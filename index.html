@@ -2029,20 +2029,6 @@
         });
         updateUploadZone(true);
 
-        // Set default text if empty
-        if (!appState.titleText) {
-          const defaultTitle = appState.currentLanguage === 'en' ? 'Your Title Here' : '在此输入标题';
-          document.getElementById('titleInput').value = defaultTitle;
-          document.getElementById('titleCount').textContent = defaultTitle.length;
-          updateState({ titleText: defaultTitle });
-        }
-        if (!appState.subtitleText) {
-          const defaultSubtitle = appState.currentLanguage === 'en' ? 'Your subtitle here' : '在此输入副标题';
-          document.getElementById('subtitleInput').value = defaultSubtitle;
-          document.getElementById('subtitleCount').textContent = defaultSubtitle.length;
-          updateState({ subtitleText: defaultSubtitle });
-        }
-
         extractAndNormalize();
       };
     }
