@@ -1348,6 +1348,11 @@
         }
       }
 
+      // Force the canvas to apply the font by setting it first
+      // This primes the canvas rendering pipeline
+      ctx.font = '600 34px Poppins, sans-serif';
+      ctx.font = '500 18px Poppins, sans-serif';
+
       // Title
       if (appState.titleText) {
         ctx.font = '600 34px Poppins, sans-serif';
@@ -1877,7 +1882,7 @@
     // ============================================
     // INITIALIZATION
     // ============================================
-    function init() {
+    async function init() {
       // Set initial language
       if (appState.currentLanguage === 'zh') {
         document.getElementById('langToggle').textContent = 'EN';
@@ -1891,6 +1896,25 @@
       // Set initial character counts
       document.getElementById('titleCount').textContent = '0';
       document.getElementById('subtitleCount').textContent = '0';
+
+      // Prime the font rendering by drawing it on a temporary canvas
+      // This ensures the font is fully loaded in the rendering pipeline
+      if (document.fonts && document.fonts.load) {
+        try {
+          await document.fonts.load('600 34px Poppins');
+          await document.fonts.load('500 18px Poppins');
+
+          // Create a temporary canvas to force the browser to fully initialize the font
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+          tempCtx.font = '600 34px Poppins, sans-serif';
+          tempCtx.fillText('Test', 0, 0);
+          tempCtx.font = '500 18px Poppins, sans-serif';
+          tempCtx.fillText('Test', 0, 0);
+        } catch (e) {
+          // Font loading failed, continue anyway
+        }
+      }
 
       // Initialize preview
       renderPreview();
